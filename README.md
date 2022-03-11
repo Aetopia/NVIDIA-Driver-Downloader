@@ -1,5 +1,5 @@
 # NVIDIA Driver Downloader
-Allows you to install Game Ready and Studio drivers via the command line. Made with 🐍 Python!
+Allows you to download Game Ready and Studio drivers via the command line. Made with 🐍 Python!
 
 # Usage:
 1. `-download <Driver Version>`: Download the latest driver or provide a driver version to download.
