@@ -8,4 +8,4 @@ Allows you to install Game Ready and Studio drivers via the command line. Made w
 4. `-dir`: Specify the directory where the driver should be downloaded. 
 
 # Source
-Based off: https://github.com/lord-carlos/nvidia-update
+Source: https://github.com/lord-carlos/nvidia-update
