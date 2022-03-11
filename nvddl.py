@@ -1,3 +1,8 @@
+# NVIDIA Driver Downloader made by Aetopia.
+# GitHub Repository: https://github.com/Aetopia/NVIDIA-Driver-Downloader
+# Discord: https://dsc.gg/CTT
+# Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
+
 from os import getcwd
 from urllib.request import urlopen, HTTPError
 from argparse import ArgumentParser
@@ -48,11 +53,28 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
     except:
         print("Version isn't valid...")   
 
-parser = ArgumentParser()
-parser.add_argument('-list', action = 'store_true')
-parser.add_argument('-download', nargs = '?', action = 'store', default = '', type = str)
-parser.add_argument('-type', nargs = 1, action = 'store')
-parser.add_argument('-dir', nargs = 1, action='store')
+parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command line. Made with Python!')
+arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group(required = True)
+options = parser.add_argument_group('Options')
+arguments.add_argument('-list', '-ls',
+                        action = 'store_true', 
+                        help = 'Show all available driver versions.')
+arguments.add_argument('-download', '-dl',
+                        nargs = '?', 
+                        action = 'store', 
+                        default = '', 
+                        type = str, 
+                        help = 'Download the latest or specified driver version.', metavar='<Driver Version>')
+options.add_argument('-type', 
+                    nargs = 1, 
+                    action = 'store', 
+                    help = 'Specify the driver type.', 
+                    metavar = '<GR/Studio>')
+options.add_argument('-dir', 
+                    nargs = 1, 
+                    action='store', 
+                    help = 'Specify the directory where the driver should be downloaded.', 
+                    metavar = '<Directory>')
 args = parser.parse_args()
 
 if len(argv) != 1:
@@ -85,4 +107,4 @@ if len(argv) != 1:
         print(f'Version: {args.download}')
         download(driver_version=args.download, studio_drivers = studio_drivers, dir = dir)  
 else:
-    parser.parse_args('-h'.split())         
+    parser.parse_args('-h'.split())
