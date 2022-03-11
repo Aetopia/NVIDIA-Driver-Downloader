@@ -54,7 +54,7 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
         print("Version isn't valid...")   
 
 parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command line. Made with Python!')
-arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group(required = True)
+arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group()
 options = parser.add_argument_group('Options')
 arguments.add_argument('-list', '-ls',
                         action = 'store_true', 
@@ -107,4 +107,4 @@ if len(argv) != 1:
         print(f'Version: {args.download}')
         download(driver_version=args.download, studio_drivers = studio_drivers, dir = dir)  
 else:
-    parser.parse_args('-h'.split())
+    parser.parse_args('-h'.split())         
