@@ -73,7 +73,7 @@ def unpack(driver_file, dir = getcwd()):
             print(f'Unpacked to {Path(path.abspath(dir))}')
 
 # Command Line Interface
-parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command line. Made with Python!')
+parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!')
 arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group()
 options = parser.add_argument_group('Options')
 arguments.add_argument('-list', '-ls',
