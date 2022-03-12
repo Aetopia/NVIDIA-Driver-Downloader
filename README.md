@@ -20,4 +20,4 @@ pip install nuitka zstandard
 2. Run `build.bat`.
 
 # Sources
-#### This project is uses some handy information on NVIDIA's Advanced Driver Search from [NVIDIA-Update](https://github.com/lord-carlos/nvidia-update).
+#### This project is uses some handy information on NVIDIA's Advanced Driver Search & Driver Unpacking from [NVIDIA-Update](https://github.com/lord-carlos/nvidia-update).
