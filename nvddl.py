@@ -4,8 +4,9 @@
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
 # Modules
-from os import getcwd
+from os import getcwd, path
 from urllib.request import urlopen, HTTPError
+from pathlib import Path
 from argparse import ArgumentParser
 from codecs import decode
 from fnmatch import fnmatch
@@ -56,7 +57,19 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
             print('Version is valid, now downloading NVIDIA Driver...')
             run(f'curl.exe -# "{driver_link}" -o "{dir}/{prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0]))
     except:
-        print("Version isn't valid...")   
+        print("Version isn't valid...")  
+
+# Unpack only the Display Driver from an NVIDIA Driver Package.
+def unpack(driver_file, dir = f'{getcwd()}'):
+    dir = f'{dir}/{path.splitext(driver_file)[0]}'
+    components = 'Display.Driver NVI2 EULA.txt ListDevices.txt GFExperience/*.txt GFExperience/locales GFExperience/EULA.html GFExperience/PrivacyPolicy setup.cfg setup.exe'
+    try:
+        archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
+    except IndexError:
+        archiver = None    
+    if archiver != None:
+        command = f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {components} -o"{dir}"'
+        run(command).returncode                 
 
 # Command Line Interface
 parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command line. Made with Python!')
@@ -66,11 +79,13 @@ arguments.add_argument('-list', '-ls',
                         action = 'store_true', 
                         help = 'Show all available driver versions.')
 arguments.add_argument('-download', '-dl',
-                        nargs = '?', 
-                        action = 'store', 
-                        default = '', 
-                        type = str, 
-                        help = 'Download the latest or specified driver version.', metavar='<Driver Version>')
+                        nargs = 1,
+                        help = 'Download the latest driver or a specified driver version.',
+                        metavar='<Driver Version>')
+arguments.add_argument('-unpack',
+                        nargs = 1,
+                        help = 'Unpack only the display driver from a driver package.',
+                        metavar='<Driver File>')                        
 options.add_argument('-type', 
                     nargs = 1, 
                     action = 'store', 
@@ -79,7 +94,7 @@ options.add_argument('-type',
 options.add_argument('-dir', 
                     nargs = 1, 
                     action='store', 
-                    help = 'Specify the directory where the driver should be downloaded.', 
+                    help = 'Specify the output directory.', 
                     metavar = '<Directory>')
 args = parser.parse_args()
 
@@ -104,13 +119,18 @@ if len(argv) != 1:
     if args.list is True: 
         print(title)
         print('\n'.join(get_driver_versions(studio_drivers = studio_drivers)))
-    elif args.download is None:
-        print(type)
-        print('Requesting the latest version...')
-        download(studio_drivers = studio_drivers, dir = dir)
     elif args.download is not None:
         print(type)
-        print(f'Version: {args.download}')
-        download(driver_version=args.download, studio_drivers = studio_drivers, dir = dir)  
+        if args.download[0].lower() == 'latest':
+            driver_version = None
+            print('Requesting the latest version...')
+        else:
+            driver_version = args.download
+            print(f'Version: {driver_version}')
+        download(driver_version = driver_version , studio_drivers = studio_drivers, dir = dir)
+    elif args.unpack is not None:
+        print(f'Unpacking ({args.unpack[0]})...')
+        unpack(args.unpack[0], dir = dir)     
+        print(f'Unpacked to {Path(dir)}')         
 else:
-    parser.parse_args('-h'.split())
+    parser.parse_args('-h'.split())         
