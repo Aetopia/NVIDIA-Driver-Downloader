@@ -8,6 +8,10 @@ Allows you to download NVIDIA Game Ready and Studio drivers via the command line
 4. `type <GR/Studio>`: Specify the type of driver, Game Ready or Studio.
 5. `-dir`: Specify the directory where the driver should be downloaded. 
 
+# Releases
+**Find pre-compiled binaries here:**             
+[GitHub Releases](https://github.com/Aetopia/NVIDIA-Driver-Downloader/releases)         
+
 # Build
 1. Install the following using `pip`:
 ```
