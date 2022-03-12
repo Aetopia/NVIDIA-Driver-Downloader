@@ -65,6 +65,7 @@ def unpack(driver_file, dir = getcwd()):
     try:
         archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
+        print("Error: Couldn't find (7z.exe)!")
         archiver = None    
     if archiver != None:
         command = f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {components} -o"{dir}"'
