@@ -3,6 +3,7 @@
 # Discord: https://dsc.gg/CTT
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
+# Modules
 from os import getcwd
 from urllib.request import urlopen, HTTPError
 from argparse import ArgumentParser
@@ -11,6 +12,9 @@ from fnmatch import fnmatch
 from subprocess import run
 from sys import argv
 
+# Functions
+
+# Get NVIDIA Driver Versions.
 def get_driver_versions(studio_drivers = False):
     link = 'https://www.nvidia.com/Download/processFind.aspx?psid=101&pfid=845&osid=57&lid=1&whql=1&ctk=0&dtcid=1'
     with urlopen(link) as file:
@@ -34,6 +38,7 @@ def get_driver_versions(studio_drivers = False):
     else:
         return(gr_driver_versions)            
 
+# Download an NVIDIA Driver Package.
 def download(driver_version = None, studio_drivers = False, dir = getcwd()):
     if driver_version is None:
         driver_versions = get_driver_versions(studio_drivers = studio_drivers)
@@ -53,6 +58,7 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
     except:
         print("Version isn't valid...")   
 
+# Command Line Interface
 parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command line. Made with Python!')
 arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group()
 options = parser.add_argument_group('Options')
@@ -107,4 +113,4 @@ if len(argv) != 1:
         print(f'Version: {args.download}')
         download(driver_version=args.download, studio_drivers = studio_drivers, dir = dir)  
 else:
-    parser.parse_args('-h'.split())         
+    parser.parse_args('-h'.split())
