@@ -89,12 +89,12 @@ arguments.add_argument('-unpack',
                         metavar='[Driver File]')                        
 options.add_argument('-studio', 
                     action = 'store_true', 
-                    help = 'Set the driver type to Studio. (Default: Game Ready)')
+                    help = 'Set the driver type to Studio.')
 options.add_argument('-dir', 
                     nargs = '?',
                     default = getcwd(), 
                     action='store', 
-                    help = 'Specify the output directory. (Default: Current Working Directory)', 
+                    help = 'Specify the output directory.', 
                     metavar = 'Directory')
 args = parser.parse_args()
 
