@@ -60,8 +60,7 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
         print("Version isn't valid...")  
 
 # Unpack only the Display Driver from an NVIDIA Driver Package.
-def unpack(driver_file, dir = f'{getcwd()}'):
-    dir = f'{dir}/{path.splitext(driver_file)[0]}'
+def unpack(driver_file, dir = getcwd()):
     components = 'Display.Driver NVI2 EULA.txt ListDevices.txt GFExperience/*.txt GFExperience/locales GFExperience/EULA.html GFExperience/PrivacyPolicy setup.cfg setup.exe'
     try:
         archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
@@ -133,4 +132,4 @@ if len(argv) != 1:
         unpack(args.unpack[0], dir = dir)     
         print(f'Unpacked to {Path(dir)}')         
 else:
-    parser.parse_args('-h'.split())         
+    parser.parse_args('-h'.split())
