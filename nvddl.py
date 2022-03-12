@@ -82,55 +82,40 @@ arguments.add_argument('-list', '-ls',
 arguments.add_argument('-download', '-dl',
                         nargs = 1,
                         help = 'Download the latest driver or a specified driver version.',
-                        metavar='<Driver Version>')
+                        metavar='[Driver Version]')
 arguments.add_argument('-unpack',
                         nargs = 1,
                         help = 'Unpack only the display driver from a driver package.',
-                        metavar='<Driver File>')                        
-options.add_argument('-type', 
-                    nargs = 1, 
-                    action = 'store', 
-                    help = 'Specify the driver type.', 
-                    metavar = '<GR/Studio>')
+                        metavar='[Driver File]')                        
+options.add_argument('-studio', 
+                    action = 'store_true', 
+                    help = 'Set the driver type to Studio. (Default: Game Ready)')
 options.add_argument('-dir', 
-                    nargs = 1, 
+                    nargs = '?',
+                    default = getcwd(), 
                     action='store', 
-                    help = 'Specify the output directory.', 
-                    metavar = '<Directory>')
+                    help = 'Specify the output directory. (Default: Current Working Directory)', 
+                    metavar = 'Directory')
 args = parser.parse_args()
 
-if len(argv) != 1:
-    try:
-        if args.type[0].lower() == 'gr' or args.type[0].lower() == 'game ready':
-                title = 'Looking for Game Ready Drivers...'
-                studio_drivers = False
-                type = 'Downloading Game Ready Driver...'
-        elif args.type[0].lower() == 'studio': 
-            title = 'Looking for Studio Drivers...' 
-            studio_drivers = True  
-            type = 'Downloading Studio Driver...'
-    except:
-        title = 'Looking for Game Ready Drivers...'
-        studio_drivers = False 
-        type = 'Downloading Game Ready Driver...'
-    try:
-        dir = args.dir[0]
-    except:
-        dir = getcwd()    
-    if args.list is True: 
-        print(title)
-        print('\n'.join(get_driver_versions(studio_drivers = studio_drivers)))
-    elif args.download is not None:
-        print(type)
-        if args.download[0].lower() == 'latest':
-            driver_version = None
-            print('Requesting the latest version...')
-        else:
-            driver_version = args.download[0]
-            print(f'Version: {driver_version}')
-        download(driver_version = driver_version , studio_drivers = studio_drivers, dir = dir)
-    elif args.unpack is not None:
-        print(f'Unpacking ({args.unpack[0]})...')
-        unpack(args.unpack[0], dir = dir)         
+if args.studio is True:
+    driver_type = 'Studio'   
+elif args.studio is False:
+    driver_type = 'Game Ready' 
+if args.list is True: 
+    print(f'Looking for {driver_type} Drivers...')
+    print('\n'.join(get_driver_versions(studio_drivers = args.studio)))
+elif args.download is not None:
+    print(f'Downloading {driver_type} Driver...')
+    if args.download[0].lower() == 'latest':
+        driver_version = None
+        print('Requesting the latest version...')
+    else:
+        driver_version = args.download[0]
+        print(f'Version: {driver_version}')
+    download(driver_version = driver_version , studio_drivers = args.studio, dir = args.dir)
+elif args.unpack is not None:
+    print(f'Unpacking ({args.unpack[0]})...')
+    unpack(args.unpack[0], dir = args.dir)         
 else:
-    parser.parse_args('-h'.split())         
+    parser.parse_args('-h'.split())
