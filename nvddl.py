@@ -125,7 +125,7 @@ if len(argv) != 1:
             driver_version = None
             print('Requesting the latest version...')
         else:
-            driver_version = args.download
+            driver_version = args.download[0]
             print(f'Version: {driver_version}')
         download(driver_version = driver_version , studio_drivers = studio_drivers, dir = dir)
     elif args.unpack is not None:
