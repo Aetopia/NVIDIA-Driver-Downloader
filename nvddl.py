@@ -11,7 +11,6 @@ from argparse import ArgumentParser
 from codecs import decode
 from fnmatch import fnmatch
 from subprocess import run
-from sys import argv
 
 # Functions
 
