@@ -15,7 +15,7 @@ from subprocess import run
 def get_driver_versions(studio_drivers = False):
     gr_driver_versions = () 
     studio_driver_versions = ()
-    link = get_gpu()
+    link = detect_gpu()
     with urlopen(link) as file:
         file = [line.decode('UTF-8').strip() for line in file]      
     for line in file:
@@ -84,18 +84,28 @@ def update(studio_drivers = False):
     else:
         print('Your current driver is outdated! Please update!')     
 
-# Get PSID and PFID of the installed NVIDIA GPU.
-def get_gpu():
-    index = ()
+# Get PSID and PFID of the installed NVIDIA GPU and return the driver list page.
+def detect_gpu():
     for GPU in WMI().Win32_VideoController():
         gpu = GPU.wmi_property('Caption').value
         if 'nvidia' in gpu.lower():
-            gpu = gpu.split("NVIDIA")[1].strip()
+            if 'geforce' in gpu.lower():
+                gpu = gpu.split("NVIDIA")[1].strip()
             break
+        else:
+            # Fallback Mode
+            gpu = 'GeForce GTX 1050'    
+    ids = gpus()[gpu] 
+    psid, pfid = ids['PSID'], ids['PFID']
+    return LINK.format(psid=psid, pfid=pfid, osid=57, lid=1, dtcid=1, dtid=1)    
+
+# Parse the GPU List XML file into a dictionary.
+def gpus():
+    response = {}
     with urlopen('https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=3') as file:
         lines = [line.decode('UTF-8').strip() for line in file.read().splitlines()]
     for x,y in enumerate(lines):
-        if fnmatch(y, f'<Name>{gpu}</Name>'):
-            index = lines[x-1].split('LookupValue ParentID="')[1].split('">')[0], lines[x+1].split('<')[1].split('>')[1]
-    psid, pfid = index   
-    return LINK.format(psid=psid, pfid=pfid, osid=57, lid=1, dtcid=1, dtid=1)      
+        if fnmatch(y, f'<Name>*</Name>'): 
+            if y.split('<Name>')[1].split('</Name>')[0] not in response.keys():
+                response[y.split('<Name>')[1].split('</Name>')[0]] = {'PSID':lines[x-1].split('LookupValue ParentID="')[1].split('">')[0], 'PFID':lines[x+1].split('<')[1].split('>')[1]}
+    return response
