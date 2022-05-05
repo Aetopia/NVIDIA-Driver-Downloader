@@ -2,12 +2,13 @@
 Allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with 🐍 Python!
 
 # Usage:
-1. `--download <Driver Version>`: Download the latest driver or a specified driver version.
-2. `--list`: Return a list of driver versions.
-3. `--unpack <Driver File>`: Unpack only the display driver from a driver package.
-4. `--studio`: Set the driver type to Studio. (Default: Game Ready)
-5. `--dir`: Specify the output directory.
-6. `--update`: Check if the installed NVIDIA driver is outdated or not.
+1. `--download <Driver Version>` | Download a specified driver version.     
+`--download` | Download the latest driver.
+2. `--list` | Return a list of driver versions.
+3. `--unpack <Driver File>` | Unpack only the display driver from a driver package.
+4. `--studio` | Set the driver type to Studio. (Default: Game Ready)
+5. `--dir` | Specify the output directory.
+6. `--update` | Check if the installed NVIDIA driver is outdated or not.
 
 # Releases
 **Find pre-compiled binaries here:**             

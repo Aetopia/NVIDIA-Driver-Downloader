@@ -1,7 +1,8 @@
 
 # Modules
+from shutil import ExecError
 from constants import * # constants.py
-from os import getcwd, makedirs, path
+from os import getcwd, makedirs, path, mkdir
 from urllib.request import urlopen 
 from urllib.error import HTTPError
 from pathlib import Path
@@ -49,32 +50,35 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
     match studio_drivers:
         case True:
             prefix = 'Studio'
-            if WMI().Win32_Battery() == []: driver_link = STUDIO_DESKTOP_LINK 
-            else: driver_link = STUDIO_NOTEBOOK_LINK     
+            if WMI().Win32_Battery() == []: driver_links = STUDIO_DESKTOP_LINK 
+            else: driver_links = STUDIO_NOTEBOOK_LINK     
         case False:
             prefix = 'Game Ready'
-            if WMI().Win32_Battery() == []: driver_link = GR_DESKTOP_LINK 
-            else: driver_link = GR_NOTEBOOK_LINK    
+            if WMI().Win32_Battery() == []: driver_links = GR_DESKTOP_LINK 
+            else: driver_links = GR_NOTEBOOK_LINK    
 
     print('Checking Download...')
-    try:
-        if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
-            print('Version is valid, now downloading NVIDIA Driver...')
-            run(f'curl.exe -# "{driver_link}" -o "{dir}/{prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0]))       
-    except:
-        print("Version isn't valid...")  
+    for index, driver_link in enumerate(driver_links):
+        try:
+            if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
+                print('Version is valid, now downloading NVIDIA Driver...')
+                run(f'curl.exe -# "{driver_link}" -o "{dir}/{prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])) 
+                break           
+        except HTTPError:
+            if index == len(driver_links)-1:
+                print("Error: Version isn't valid!")
 
 # Unpack only the Display Driver from an NVIDIA Driver Package.
 def unpack(driver_file, dir = getcwd()):
-    try:
-        archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
+    dir = f'{dir}/{path.splitext(driver_file)[0]}'
+
+    try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
         print("Error: Couldn't find (7z.exe)!")
-        archiver = None    
-    if archiver != None:
-        command = f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {COMPONENTS} -o"{dir}"'
-        if run(command).returncode == 0:
-            print(f'Unpacked to {Path(path.abspath(dir))}')
+        exit(1) 
+
+    if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {COMPONENTS} -o"{dir}"').returncode == 0:
+        print(f'Unpacked to "{Path(path.abspath(dir))}"')
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False):
@@ -97,15 +101,15 @@ def detect_gpu():
             gpu = 'GeForce GTX 1050'    
     ids = gpus()[gpu] 
     psid, pfid = ids['PSID'], ids['PFID']
-    return LINK.format(psid=psid, pfid=pfid, osid=57, lid=1, dtcid=1, dtid=1)    
+    return LINK.format(psid=psid, pfid=pfid, osid=57, lid=1, dtcid=1, dtid=1)   
 
 # Parse the GPU List XML file into a dictionary.
 def gpus():
     response = {}
     with urlopen('https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=3') as file:
         lines = [line.decode('UTF-8').strip() for line in file.read().splitlines()]
-    for x,y in enumerate(lines):
+    for x, y in enumerate(lines):
         if fnmatch(y, f'<Name>*</Name>'): 
             if y.split('<Name>')[1].split('</Name>')[0] not in response.keys():
                 response[y.split('<Name>')[1].split('</Name>')[0]] = {'PSID':lines[x-1].split('LookupValue ParentID="')[1].split('">')[0], 'PFID':lines[x+1].split('<')[1].split('>')[1]}
-    return response
+    return response     
