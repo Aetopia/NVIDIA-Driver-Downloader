@@ -1,8 +1,7 @@
 
 # Modules
-from shutil import ExecError
 from constants import * # constants.py
-from os import getcwd, makedirs, path, mkdir
+from os import getcwd, makedirs, path
 from urllib.request import urlopen 
 from urllib.error import HTTPError
 from pathlib import Path
@@ -26,13 +25,15 @@ def get_driver_versions(studio_drivers = False):
                 gr_driver_versions += driver_version,
     if studio_drivers:
         for driver_version in gr_driver_versions:
-            try:
-                if WMI().Win32_Battery() == []: driver_link = STUDIO_DESKTOP_LINK 
-                else: driver_link = STUDIO_NOTEBOOK_LINK 
-                if urlopen(f'{driver_link}'.format(driver_version = driver_version)).getcode() == 200: 
-                    studio_driver_versions += driver_version,
-            except HTTPError:
-                pass    
+            if WMI().Win32_Battery() == []: driver_links = STUDIO_DESKTOP_LINK 
+            else: driver_links = STUDIO_NOTEBOOK_LINK 
+            for driver_link in driver_links:
+                try:
+                    if urlopen(f'{driver_link}'.format(driver_version = driver_version)).getcode() == 200: 
+                        if driver_version not in studio_driver_versions:
+                            studio_driver_versions += driver_version,
+                except HTTPError:
+                    pass       
         return studio_driver_versions                          
     else:
         return gr_driver_versions           
