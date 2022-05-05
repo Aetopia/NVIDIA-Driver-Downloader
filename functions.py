@@ -12,7 +12,7 @@ from subprocess import run
 # Functions
 
 # Get NVIDIA Driver Versions.
-def get_driver_versions(studio_drivers = False):
+def get_driver_versions(studio_drivers = False, list = False):
     gr_driver_versions = () 
     studio_driver_versions = ()
     link = detect_gpu()
@@ -22,6 +22,7 @@ def get_driver_versions(studio_drivers = False):
         if fnmatch(line, '<td class="gridItem">*.*</td>'):
             driver_version = line.split('>')[1].split('<')[0]
             if driver_version != '':
+                if list is True and studio_drivers is False: print(driver_version)
                 gr_driver_versions += driver_version,
     if studio_drivers:
         for driver_version in gr_driver_versions:
@@ -31,9 +32,10 @@ def get_driver_versions(studio_drivers = False):
                 try:
                     if urlopen(f'{driver_link}'.format(driver_version = driver_version)).getcode() == 200: 
                         if driver_version not in studio_driver_versions:
+                            if list: print(driver_version)
                             studio_driver_versions += driver_version,
-                except HTTPError:
-                    pass       
+                            break
+                except HTTPError: pass         
         return studio_driver_versions                          
     else:
         return gr_driver_versions           

@@ -38,12 +38,13 @@ def main():
     args = parser.parse_args()
 
     if len(argv) != 1: 
-        if args.studio is True: driver_type = 'Studio'   
-        elif args.studio is False: driver_type = 'Game Ready' 
+        match args.studio: 
+            case True: driver_type = 'Studio'   
+            case False: driver_type = 'Game Ready' 
 
         if args.list is True: 
-            print(f'Looking for {driver_type} Drivers...')
-            print('\n'.join(get_driver_versions(studio_drivers = args.studio)))  
+            print(f'{driver_type} Drivers:')
+            get_driver_versions(studio_drivers = args.studio, list = True)
 
         elif args.unpack is not None:
             print(f'Unpacking ({path.split(args.unpack[0])[1]})...')
