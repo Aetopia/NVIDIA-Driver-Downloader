@@ -44,7 +44,7 @@ def main():
 
         if args.list is True: 
             print(f'{driver_type} Drivers:')
-            get_driver_versions(studio_drivers = args.studio, list = True)
+            print('\n'.join(get_driver_versions(studio_drivers = args.studio)))
 
         elif args.unpack is not None:
             print(f'Unpacking ({path.split(args.unpack[0])[1]})...')
@@ -58,9 +58,12 @@ def main():
             print(f'Version: {driver_version}')
             download(driver_version = driver_version , studio_drivers = args.studio, dir = args.dir)
         elif args.download is None:
-            print('Downloading the Latest Driver...')
+            print(f'Downloading the Latest {driver_type} Driver...')
             download(studio_drivers = args.studio, dir = args.dir)  
     else: parser.parse_args('-h'.split())
 
 if __name__ == '__main__':
-    main()       
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit(0)           
