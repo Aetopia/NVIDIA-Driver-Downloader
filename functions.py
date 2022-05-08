@@ -7,6 +7,7 @@ from pathlib import Path
 from wmi import WMI
 from fnmatch import fnmatch
 from subprocess import run
+from sys import exit
 
 # Functions
 
@@ -27,7 +28,7 @@ def get_driver_versions(studio_drivers = False) -> tuple:
                 driver_versions += driver_version,  
     if len(driver_versions) == 0:
         print("Error: Couldn't find any valid driver versions.")
-        exit(1)                  
+        exit()                  
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
@@ -68,7 +69,7 @@ def unpack(driver_file, dir = getcwd()):
     try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
         print("Error: Couldn't find (7z.exe)!")
-        exit(1) 
+        exit() 
 
     if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {COMPONENTS} -o"{dir}"').returncode == 0:
         print(f'Unpacked to "{Path(path.abspath(dir))}"')

@@ -6,7 +6,7 @@
 from argparse import ArgumentParser
 from os import getcwd
 from functions import *
-from sys import argv
+from sys import argv, exit
 
 def main():
     parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!')
@@ -66,4 +66,4 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        exit(0)           
+        exit()           
