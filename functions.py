@@ -24,7 +24,10 @@ def get_driver_versions(studio_drivers = False) -> tuple:
         if fnmatch(line, '<td class="gridItem">*.*</td>'):
             driver_version = line.split('>')[1].split('<')[0]
             if driver_version != '':
-                driver_versions += driver_version,           
+                driver_versions += driver_version,  
+    if len(driver_versions) == 0:
+        print("Error: Couldn't find any valid driver versions.")
+        exit(1)                  
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
@@ -34,9 +37,6 @@ def download(driver_version = None, studio_drivers = False, dir = getcwd()):
 
     if driver_version is None:
         driver_versions = get_driver_versions(studio_drivers = studio_drivers)
-        if len(driver_versions) == 0:
-            print("Error: Couldn't find any valid driver versions.")
-            exit(1) 
     else:
         driver_versions = driver_version,  
 
