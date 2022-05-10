@@ -8,15 +8,18 @@ from wmi import WMI
 from fnmatch import fnmatch
 from subprocess import run
 from sys import exit
+from utils import *
 
 # Functions
 
 # Get NVIDIA Driver Versions.
-def get_driver_versions(studio_drivers = False) -> tuple:
+def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     if studio_drivers: whql = 4
     else: whql = 1
+    if type == 'dch': dtcid = 1
+    elif type == 'std': dtcid = 0
     psid, pfid = detect_gpu()
-    link = LINK.format(psid = psid, pfid = pfid, whql = whql)
+    link = API_LINK.format(psid = psid, pfid = pfid, whql = whql, dtcid = dtcid)
     driver_versions = ()
 
     with urlopen(link) as file:
@@ -32,31 +35,34 @@ def get_driver_versions(studio_drivers = False) -> tuple:
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
-def download(driver_version = None, studio_drivers = False, dir = getcwd()):
+def download(driver_version = None, studio_drivers = False, type = 'dch', dir = getcwd()):
+    if type == 'dch': type = 'DCH'
+    elif type == 'std': type = 'STD'
+
     if path.exists(dir) is False:
         makedirs(path.abspath(dir))
 
     if driver_version is None:
-        driver_versions = get_driver_versions(studio_drivers = studio_drivers)
+        driver_versions = get_driver_versions(studio_drivers = studio_drivers, type = type)
     else:
-        driver_versions = driver_version,  
+        driver_versions = driver_version,
 
     match studio_drivers:
         case True:
             prefix = 'Studio'
-            if WMI().Win32_Battery() == []: driver_links = STUDIO_DESKTOP_LINK 
-            else: driver_links = STUDIO_NOTEBOOK_LINK     
+            if WMI().Win32_Battery() == []: driver_links = STUDIO_DESKTOP_LINKS[type]
+            else: driver_links = STUDIO_NOTEBOOK_LINKS[type]     
         case False:
             prefix = 'Game Ready'
-            if WMI().Win32_Battery() == []: driver_links = GR_DESKTOP_LINK 
-            else: driver_links = GR_NOTEBOOK_LINK    
+            if WMI().Win32_Battery() == []: driver_links = GR_DESKTOP_LINKS[type] 
+            else: driver_links = GR_NOTEBOOK_LINKS[type]    
 
     print('Checking Download...')
     for index, driver_link in enumerate(driver_links):
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
                 print('Version is valid, now downloading NVIDIA Driver...')
-                run(f'curl.exe -# "{driver_link}" -o "{dir}/{prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])) 
+                run(f'curl.exe -# "{driver_link}" -o "{dir}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])) 
                 break           
         except HTTPError:
             if index == len(driver_links)-1:
@@ -80,29 +86,4 @@ def update(studio_drivers = False) -> None:
     if installed_driver_version == get_driver_versions(studio_drivers = studio_drivers)[0]:
         print('The latest driver has been installed.')
     else:
-        print('Your current driver is outdated! Please update!')     
-
-# Get PSID and PFID of the installed NVIDIA GPU.
-def detect_gpu() -> tuple:
-    for GPU in WMI().Win32_VideoController():
-        gpu = GPU.wmi_property('Caption').value
-        if 'nvidia' in gpu.lower():
-            if 'geforce' in gpu.lower():
-                gpu = gpu.split("NVIDIA")[1].strip()
-            break
-        else:
-            # Fallback Mode
-            gpu = 'GeForce GTX 1050'    
-    ids = gpus()[gpu] 
-    return ids['PSID'], ids['PFID']
-
-# Parse the GPU List XML file into a dictionary.
-def gpus() -> dict:
-    response = {}
-    with urlopen('https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=3') as file:
-        lines = [line.decode('UTF-8').strip() for line in file.read().splitlines()]
-    for x, y in enumerate(lines):
-        if fnmatch(y, f'<Name>*</Name>'): 
-            if y.split('<Name>')[1].split('</Name>')[0] not in response.keys():
-                response[y.split('<Name>')[1].split('</Name>')[0]] = {'PSID':lines[x-1].split('LookupValue ParentID="')[1].split('">')[0], 'PFID':lines[x+1].split('<')[1].split('>')[1]}
-    return response     
+        print('Your current driver is outdated! Please update!') 

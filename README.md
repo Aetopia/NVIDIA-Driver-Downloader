@@ -7,7 +7,8 @@ Allows you to download NVIDIA Game Ready and Studio drivers via the command-line
 2. `--list` | Return a list of driver versions.
 3. `--unpack <Driver File>` | Unpack only the display driver from a driver package.
 4. `--studio` | Set the driver type to Studio. (Default: Game Ready)
-5. `--dir` | Specify the output directory.
+5. `--standard` | Set the driver type to Standard. (Default: DCH)
+5. `--dir <Directory>` | Specify the output directory.
 6. `--update` | Check if the installed NVIDIA driver is outdated or not.
 
 # Releases
