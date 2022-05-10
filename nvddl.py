@@ -47,7 +47,7 @@ def main():
         match args.standard:
             case True: type = 'std'
             case False: type = 'dch'
-
+            
         if args.list is True: 
             print(f'{driver_type} Drivers:')
             print('\n'.join(get_driver_versions(studio_drivers = args.studio, type = type)))

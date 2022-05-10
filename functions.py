@@ -16,8 +16,8 @@ from utils import *
 def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     if studio_drivers: whql = 4
     else: whql = 1
-    if type == 'dch': dtcid = 1
-    elif type == 'std': dtcid = 0
+    if type.lower() == 'dch': dtcid = 1
+    elif type.lower() == 'std': dtcid = 0
     psid, pfid = detect_gpu()
     link = API_LINK.format(psid = psid, pfid = pfid, whql = whql, dtcid = dtcid)
     driver_versions = ()
