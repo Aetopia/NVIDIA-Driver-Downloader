@@ -50,12 +50,14 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
     match studio_drivers:
         case True:
             prefix = 'Studio'
-            if WMI().Win32_Battery() == []: driver_links = STUDIO_DESKTOP_LINKS[type]
-            else: driver_links = STUDIO_NOTEBOOK_LINKS[type]     
+            match system_type(): 
+                case 'laptop': driver_links = STUDIO_DESKTOP_LINKS[type]
+                case 'desktop': driver_links = STUDIO_NOTEBOOK_LINKS[type]     
         case False:
             prefix = 'Game Ready'
-            if WMI().Win32_Battery() == []: driver_links = GR_DESKTOP_LINKS[type] 
-            else: driver_links = GR_NOTEBOOK_LINKS[type]    
+            match system_type():
+                case 'laptop': driver_links = GR_DESKTOP_LINKS[type] 
+                case 'desktop': driver_links = GR_NOTEBOOK_LINKS[type]    
 
     print('Checking Download...')
     for index, driver_link in enumerate(driver_links):

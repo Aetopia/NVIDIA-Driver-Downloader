@@ -22,10 +22,10 @@ pip install wmi
 
 # Build
 1. Install the following using `pip`:
-```
-pip install nuitka zstandard
-```
-2. Run `build.bat`.
+    ```
+    pip install nuitka zstandard
+    ```
+2. Go into the `src` folder and run `build.bat`.
 
 # Sources
 ### 1. NVIDIA's Advanced Driver Search & Driver Package Unpacking: [NVIDIA-Update](https://github.com/lord-carlos/nvidia-update)
