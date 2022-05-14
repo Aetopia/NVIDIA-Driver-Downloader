@@ -40,7 +40,7 @@ def main():
                         metavar = 'Directory') 
     options.add_argument('--minimal', '-m',
                         action = 'store_true',
-                        help='Debloat the a driver package as soon as its downloaded.')                                       
+                        help='Debloat a driver package as soon as its downloaded.')                                       
     args = parser.parse_args()
 
     if len(argv) != 1: 
