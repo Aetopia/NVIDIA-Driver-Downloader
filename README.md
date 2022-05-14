@@ -10,6 +10,7 @@ Allows you to download NVIDIA Game Ready and Studio drivers via the command-line
 5. `--standard` | Set the driver type to Standard. (Default: DCH)
 5. `--dir <Directory>` | Specify the output directory.
 6. `--update` | Check if the installed NVIDIA driver is outdated or not.
+7. `--minimal` | Debloat a driver package as soon as its downloaded.
 
 # Releases
 **Find pre-compiled binaries here:**             
