@@ -1,10 +1,10 @@
 # Modules
 from constants import * # constants.py
-from os import getcwd, makedirs, path
+from os import getcwd, makedirs, path, getenv
+from subprocess import Popen, DEVNULL, STDOUT
 from urllib.request import urlopen 
 from urllib.error import HTTPError
 from pathlib import Path
-from wmi import WMI
 from fnmatch import fnmatch
 from subprocess import run
 from sys import exit
@@ -35,9 +35,10 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
-def download(driver_version = None, studio_drivers = False, type = 'dch', dir = getcwd()):
-    if type == 'dch': type = 'DCH'
-    elif type == 'std': type = 'STD'
+def download(driver_version = None, studio_drivers = False, type = 'dch', dir = getcwd(), minimal = False):
+    if type == 'dch': type = 'DCH';print('Type: DCH')
+    elif type == 'std': type = 'STD';print('Type: Standard')
+    if minimal: dir = getenv('TEMP')
 
     if path.exists(dir) is False:
         makedirs(path.abspath(dir))
@@ -63,8 +64,12 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
     for index, driver_link in enumerate(driver_links):
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
-                print('Version is valid, now downloading NVIDIA Driver...')
+                print('Version is valid, now downloading NVIDIA Driver Package...')
                 run(f'curl.exe -# "{driver_link}" -o "{dir}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])) 
+                if minimal: 
+                    print('Trying to unpack downloaded Driver Package...')
+                    unpack(f"{dir}/{type} {prefix} - {driver_versions[0]}.exe", dir)
+                    Popen(f'{dir}/{type} {prefix} - {driver_versions[0]}/setup.exe', shell=True, stdout = DEVNULL, stderr = STDOUT)
                 break           
         except HTTPError:
             if index == len(driver_links)-1:
@@ -72,7 +77,7 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
 
 # Unpack only the Display Driver from an NVIDIA Driver Package.
 def unpack(driver_file, dir = getcwd()):
-    dir = f'{dir}/{path.splitext(driver_file)[0]}'
+    dir = f'{dir}/{path.split(path.splitext(driver_file)[0])[1]}'
 
     try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
@@ -84,6 +89,8 @@ def unpack(driver_file, dir = getcwd()):
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False) -> None:
+    if studio_drivers: print('Type: Studio')
+    else: print('Type: Game Ready')
     installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
     if installed_driver_version == get_driver_versions(studio_drivers = studio_drivers)[0]:
         print('The latest driver has been installed.')

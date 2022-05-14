@@ -37,7 +37,10 @@ def main():
                         default = getcwd(), 
                         action='store', 
                         help = 'Specify the output directory.', 
-                        metavar = 'Directory')                    
+                        metavar = 'Directory') 
+    options.add_argument('--minimal', '-m',
+                        action = 'store_true',
+                        help='Debloat the a driver package as soon as its downloaded.')                                       
     args = parser.parse_args()
 
     if len(argv) != 1: 
@@ -62,10 +65,10 @@ def main():
             print(f'Downloading {driver_type} Driver...')
             driver_version = args.download
             print(f'Version: {driver_version}')
-            download(driver_version = driver_version , studio_drivers = args.studio, type = type, dir = args.dir)
+            download(driver_version = driver_version , studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal)
         elif args.download is None:
             print(f'Downloading the Latest {driver_type} Driver...')
-            download(studio_drivers = args.studio, type = type, dir = args.dir)  
+            download(studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal)  
     else: parser.print_help()
 
 if __name__ == '__main__':
