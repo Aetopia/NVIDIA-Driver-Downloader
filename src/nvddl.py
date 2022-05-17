@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from os import getcwd
 from functions import *
 from sys import argv, exit
+from tempfile import gettempdir
 
 def main():
     parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!')
