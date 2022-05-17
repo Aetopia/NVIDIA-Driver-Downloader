@@ -1,6 +1,7 @@
 # Modules
 from constants import * # constants.py
-from os import getcwd, makedirs, path, getenv
+from os import getcwd, makedirs, path
+from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT
 from urllib.request import urlopen 
 from urllib.error import HTTPError
@@ -18,7 +19,7 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     else: whql = 1
     if type.lower() == 'dch': dtcid = 1
     elif type.lower() == 'std': dtcid = 0
-    psid, pfid = detect_gpu()
+    psid, pfid = get_gpu()
     link = API_LINK.format(psid = psid, pfid = pfid, whql = whql, dtcid = dtcid)
     driver_versions = ()
 
@@ -35,10 +36,9 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
-def download(driver_version = None, studio_drivers = False, type = 'dch', dir = getcwd(), minimal = False):
+def download(driver_version = None, studio_drivers = False, type = 'dch', dir = gettempdir(), minimal = False):
     if type == 'dch': type = 'DCH';print('Type: DCH')
     elif type == 'std': type = 'STD';print('Type: Standard')
-    if minimal: dir = getenv('TEMP')
 
     if path.exists(dir) is False:
         makedirs(path.abspath(dir))
@@ -67,9 +67,10 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
                 print('Version is valid, now downloading NVIDIA Driver Package...')
                 run(f'curl.exe -# "{driver_link}" -o "{dir}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])) 
                 if minimal: 
-                    print('Trying to unpack downloaded Driver Package...')
+                    print('Trying to unpack the downloaded Driver Package...')
                     unpack(f"{dir}/{type} {prefix} - {driver_versions[0]}.exe", dir)
                     Popen(f'{dir}/{type} {prefix} - {driver_versions[0]}/setup.exe', shell=True, stdout = DEVNULL, stderr = STDOUT)
+                else: Popen(f'{dir}/{type} {prefix} - {driver_versions[0]}.exe', shell=True, stdout = DEVNULL, stderr = STDOUT)    
                 break           
         except HTTPError:
             if index == len(driver_links)-1:
@@ -96,3 +97,8 @@ def update(studio_drivers = False) -> None:
         print('The latest driver has been installed.')
     else:
         print('Your current driver is outdated! Please update!') 
+        while True:
+            option = input('Update? (Y/N): ')
+            if option.lower().strip() in ('y','yes', ''):
+                download(minimal = True); break
+            elif option.lower().strip() in ('n', 'no'): print("The latest driver won't be downloaded."); break    

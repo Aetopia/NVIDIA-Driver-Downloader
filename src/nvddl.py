@@ -34,7 +34,7 @@ def main():
                          help='Set the driver type to Standard.')
     options.add_argument('--dir', '-d',
                         nargs = '?',
-                        default = getcwd(), 
+                        default = gettempdir(), 
                         action='store', 
                         help = 'Specify the output directory.', 
                         metavar = 'Directory') 

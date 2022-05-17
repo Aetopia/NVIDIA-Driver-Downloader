@@ -4,19 +4,20 @@ from urllib.request import urlopen
 from sys import exit
 
 # Get PSID and PFID of the installed NVIDIA GPU.
-def detect_gpu() -> tuple:
-    for GPU in WMI().Win32_VideoController():
-        gpu = GPU.wmi_property('Caption').value
-        if 'nvidia' in gpu.lower():
-            if 'geforce' in gpu.lower():
-                gpu = gpu.split("NVIDIA")[1].strip()
-            break
-        else:
-            print('NVDDL is currently running in fallback mode.')
-            gpu = 'GeForce GTX 1050'    
-    ids = gpus()[gpu] 
-    return ids['PSID'], ids['PFID']
-
+def get_gpu() -> tuple:
+    gpu_list = gpus()
+    IS_NOT_NVIDIA = False
+    for detected_gpus in WMI().Win32_VideoController():
+        detected_gpu = detected_gpus.wmi_property('Caption').value
+        if 'nvidia' in detected_gpu.lower():
+            for gpu in gpu_list.keys():
+                if gpu in detected_gpu:
+                    return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
+        else: IS_NOT_NVIDIA = True
+    if IS_NOT_NVIDIA: 
+        print('No NVIDIA GPU Detected: Using Fallback Mode.')
+        return gpu_list['GeForce GTX 1050' ]['PSID'], gpu_list['GeForce GTX 1050' ]['PFID']
+    
 # Parse the GPU List XML file into a dictionary.
 def gpus() -> dict:
     response = {}
