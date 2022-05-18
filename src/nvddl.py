@@ -4,7 +4,6 @@
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
 from argparse import ArgumentParser
-from os import getcwd
 from functions import *
 from sys import argv, exit
 from tempfile import gettempdir
@@ -73,8 +72,7 @@ def main():
     else: parser.print_help()
 
 if __name__ == '__main__':
-    try:
-        main()
+    try: main()
     except KeyboardInterrupt:
         print('\nWarning: Operation cancelled.')
         exit()           
