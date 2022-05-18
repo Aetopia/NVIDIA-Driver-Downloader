@@ -5,6 +5,7 @@
 
 from argparse import ArgumentParser
 from functions import *
+from os import getcwd, path
 from sys import argv, exit
 from tempfile import gettempdir
 
@@ -44,6 +45,7 @@ def main():
     args = parser.parse_args()
 
     if len(argv) != 1: 
+        if args.dir is None: args.dir = getcwd()
         match args.studio: 
             case True: driver_type = 'Studio'   
             case False: driver_type = 'Game Ready' 

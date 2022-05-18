@@ -8,9 +8,10 @@ This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
 3. `--unpack <Driver File>` | Unpack only the display driver from a driver package.
 4. `--studio` | Set the driver type to Studio. (Default: Game Ready)
 5. `--standard` | Set the driver type to Standard. (Default: DCH)
-5. `--dir <Directory>` | Specify the output directory.
-6. `--update` | Check if the installed NVIDIA driver is outdated or not.
-7. `--minimal` | Debloat a driver package as soon as its downloaded.
+6. `--dir <Directory>` | Specify the output directory.    
+`--dir` | Set the output directory to the current working directory.
+7. `--update` | Check if the installed NVIDIA driver is outdated or not.
+8. `--minimal` | Debloat a driver package as soon as its downloaded.
 
 # Releases
 **Find pre-compiled binaries here:**             

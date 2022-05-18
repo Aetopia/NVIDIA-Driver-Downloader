@@ -65,7 +65,8 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
                 print('Version is valid, now downloading NVIDIA Driver Package...')
-                run(f'curl.exe -# "{driver_link}" -o "{dir}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])) 
+                if run(f'curl.exe -# "{driver_link}" -o "{dir}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])).returncode != 0:
+                    raise KeyboardInterrupt
                 if minimal: 
                     print('Trying to unpack the downloaded Driver Package...')
                     unpack(f"{dir}/{type} {prefix} - {driver_versions[0]}.exe", dir)
