@@ -69,9 +69,11 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
                     raise KeyboardInterrupt
                 if minimal: 
                     print('Trying to unpack the downloaded Driver Package...')
-                    unpack(f"{dir}/{type} {prefix} - {driver_versions[0]}.exe", dir)
-                    Popen(f'{dir}/{type} {prefix} - {driver_versions[0]}/setup.exe', shell=True, stdout = DEVNULL, stderr = STDOUT)
-                else: Popen(f'{dir}/{type} {prefix} - {driver_versions[0]}.exe', shell=True, stdout = DEVNULL, stderr = STDOUT)    
+                    filepath = f'{dir}/{type} {prefix} - {driver_versions[0]}'
+                    unpack(f"{filepath}.exe", dir)
+                    file = f'{filepath}/setup.exe'
+                else: file = f'{filepath}.exe'
+                Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT)    
                 break           
         except HTTPError:
             if index == len(driver_links)-1:

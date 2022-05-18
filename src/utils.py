@@ -16,7 +16,7 @@ def get_gpu() -> tuple:
         else: IS_NOT_NVIDIA = True
     if IS_NOT_NVIDIA: 
         print('No NVIDIA GPU Detected: Using Fallback Mode.')
-        return gpu_list['GeForce GTX 1050' ]['PSID'], gpu_list['GeForce GTX 1050' ]['PFID']
+        return gpu_list['GeForce GTX 1050' ]['PSID'], gpu_list['GeForce GTX 1050']['PFID']
     
 # Parse the GPU List XML file into a dictionary.
 def gpus() -> dict:
@@ -38,4 +38,4 @@ def system_type() -> str:
         return 'desktop'
     else:
         print("Error: Couldn't detect system type.")
-        exit()                  
+        exit()                         
