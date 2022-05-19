@@ -61,9 +61,9 @@ def main():
                 case False: type = 'dch'
         else: 
             parser.print_usage() 
-            print('Error: Options must be used with arguments.')
+            print('Error: Options must be used with Arguments.')
             exit()  
-            
+
         if args.list is True: 
             print(f'{driver_type} Drivers:')
             print('\n'.join(get_driver_versions(studio_drivers = args.studio, type = type)))
