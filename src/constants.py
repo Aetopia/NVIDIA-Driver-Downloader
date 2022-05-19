@@ -30,7 +30,21 @@ GR_NOTEBOOK_LINKS = {
            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-whql.exe')
 }
 
-
+# API Link.
 API_LINK = 'https://www.nvidia.com/Download/processFind.aspx?psid={psid}&pfid={pfid}&osid=57&lid=1&whql={whql}&ctk=0&dtcid={dtcid}'
-COMPONENTS = 'Display.Driver NVI2 EULA.txt ListDevices.txt GFExperience/*.txt GFExperience/locales GFExperience/EULA.html GFExperience/PrivacyPolicy setup.cfg setup.exe'
+
+# Base Driver Package Components.
+BASE_COMPONENTS = ['Display.Driver', 
+                   'NVI2', 
+                   'EULA.txt', 
+                   'ListDevices.txt', 
+                   'setup.cfg', 
+                   'setup.exe']
+
+# Setup
+SETUP = ('<file name="${{EulaHtmlFile}}"/>', 
+         '<file name="${{PrivacyPolicyFile}}"/>', 
+         '<file name="${{FunctionalConsentFile}}"/>')
+
+# Version Key
 REG_KEY = r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver" /v DisplayVersion'

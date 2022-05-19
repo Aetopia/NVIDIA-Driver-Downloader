@@ -41,11 +41,16 @@ def main():
                         metavar = 'Directory') 
     options.add_argument('--minimal', '-m',
                         action = 'store_true',
-                        help='Debloat a driver package as soon as its downloaded.')                                       
+                        help='Debloat a driver package as soon as its downloaded.')   
+    options.add_argument('--components','-c',
+                        action = 'store',
+                        nargs = '+',
+                        help = 'Select which components to include in the driver package.')                                                        
     args = parser.parse_args()
 
     if len(argv) != 1: 
         if args.dir is None: args.dir = getcwd()
+        if args.components is None: args.components = []
         match args.studio: 
             case True: driver_type = 'Studio'   
             case False: driver_type = 'Game Ready' 
@@ -59,7 +64,7 @@ def main():
 
         elif args.unpack is not None:
             print(f'Unpacking ({path.split(args.unpack[0])[1]})...')
-            unpack(args.unpack[0], dir = args.dir)   
+            unpack(args.unpack[0], dir = args.dir, components = args.components)   
 
         elif args.update is True: update(studio_drivers = args.studio)  
 
@@ -67,10 +72,10 @@ def main():
             print(f'Downloading {driver_type} Driver...')
             driver_version = args.download
             print(f'Version: {driver_version}')
-            download(driver_version = driver_version , studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal)
+            download(driver_version = driver_version , studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal, components = args.components)
         elif args.download is None:
             print(f'Downloading the Latest {driver_type} Driver...')
-            download(studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal)  
+            download(studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal, components = args.components)  
     else: parser.print_help()
 
 if __name__ == '__main__':
