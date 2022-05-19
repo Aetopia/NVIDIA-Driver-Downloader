@@ -20,10 +20,10 @@ def main():
                             nargs = '?',
                             help = 'Download the latest driver or a specified driver version.',
                             metavar='Driver Version')
-    arguments.add_argument('--unpack', '-un',
+    arguments.add_argument('--extract', '-e',
                             nargs = 1,
-                            help = 'Unpack only the display driver from a driver package.',
-                            metavar='[Driver File]')   
+                            help = 'Extract the specified driver package.',
+                            metavar='<Driver File>')   
     arguments.add_argument('--update', '-up',
                         action = 'store_true',
                         help = 'Check if the installed NVIDIA driver is outdated or not.')                                             
@@ -33,7 +33,7 @@ def main():
     options.add_argument('--standard', '-std',
                          action = 'store_true',
                          help='Set the driver type to Standard.')
-    options.add_argument('--dir', '-d',
+    options.add_argument('--output', '-o',
                         nargs = '?',
                         default = gettempdir(), 
                         action='store', 
@@ -44,27 +44,33 @@ def main():
                         help='Debloat a driver package as soon as its downloaded.')   
     options.add_argument('--components','-c',
                         action = 'store',
+                        metavar = ('Component', 'Components'),
                         nargs = '+',
                         help = 'Select which components to include in the driver package.')                                                        
     args = parser.parse_args()
 
     if len(argv) != 1: 
-        if args.dir is None: args.dir = getcwd()
-        if args.components is None: args.components = []
-        match args.studio: 
-            case True: driver_type = 'Studio'   
-            case False: driver_type = 'Game Ready' 
-        match args.standard:
-            case True: type = 'std'
-            case False: type = 'dch'
+        if ('-dl' or '--download' or '-up' or '--update' or '--extract' or '-e' or 'ls' or '--list') in argv:
+            if args.output is None: args.output = getcwd()
+            if args.components is None: args.components = []
+            match args.studio: 
+                case True: driver_type = 'Studio'   
+                case False: driver_type = 'Game Ready' 
+            match args.standard:
+                case True: type = 'std'
+                case False: type = 'dch'
+        else: 
+            parser.print_usage() 
+            print('Error: Options must be used with arguments.')
+            exit()  
             
         if args.list is True: 
             print(f'{driver_type} Drivers:')
             print('\n'.join(get_driver_versions(studio_drivers = args.studio, type = type)))
 
-        elif args.unpack is not None:
-            print(f'Unpacking ({path.split(args.unpack[0])[1]})...')
-            unpack(args.unpack[0], dir = args.dir, components = args.components)   
+        elif args.extract is not None:
+            print(f'extracting ({path.split(args.extract[0])[1]})...')
+            extract(args.extract[0], output = args.output, components = args.components)   
 
         elif args.update is True: update(studio_drivers = args.studio)  
 
@@ -72,10 +78,10 @@ def main():
             print(f'Downloading {driver_type} Driver...')
             driver_version = args.download
             print(f'Version: {driver_version}')
-            download(driver_version = driver_version , studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal, components = args.components)
+            download(driver_version = driver_version , studio_drivers = args.studio, type = type, output = args.output, minimal = args.minimal, components = args.components)
         elif args.download is None:
             print(f'Downloading the Latest {driver_type} Driver...')
-            download(studio_drivers = args.studio, type = type, dir = args.dir, minimal = args.minimal, components = args.components)  
+            download(studio_drivers = args.studio, type = type, output = args.output, minimal = args.minimal, components = args.components)  
     else: parser.print_help()
 
 if __name__ == '__main__':

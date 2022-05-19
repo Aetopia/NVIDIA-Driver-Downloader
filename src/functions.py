@@ -36,12 +36,12 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
-def download(driver_version = None, studio_drivers = False, type = 'dch', dir = gettempdir(), minimal = False, components = ()):
+def download(driver_version = None, studio_drivers = False, type = 'dch', output = gettempdir(), minimal = False, components = ()):
     if type == 'dch': type = 'DCH';print('Type: DCH')
     elif type == 'std': type = 'STD';print('Type: Standard')
 
-    if path.exists(dir) is False:
-        makedirs(path.abspath(dir))
+    if path.exists(output) is False:
+        makedirs(path.abspath(output))
 
     if driver_version is None:
         driver_versions = get_driver_versions(studio_drivers = studio_drivers, type = type)
@@ -65,12 +65,12 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
                 print('Version is valid, now downloading NVIDIA Driver Package...')
-                if run(f'curl.exe -# "{driver_link}" -o "{dir}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])).returncode != 0:
+                if run(f'curl.exe -# "{driver_link}" -o "{output}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])).returncode != 0:
                     raise KeyboardInterrupt
                 if minimal: 
-                    print('Trying to unpack the downloaded Driver Package...')
-                    filepath = f'{dir}/{type} {prefix} - {driver_versions[0]}'
-                    unpack(f"{filepath}.exe", dir, components = components)
+                    print('Trying to extract the downloaded Driver Package...')
+                    filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
+                    extract(f"{filepath}.exe", output, components = components)
                     file = f'{filepath}/setup.exe'
                 else: file = f'{filepath}.exe'
                 Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT)    
@@ -79,28 +79,28 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', dir = 
             if index == len(driver_links)-1:
                 print("Error: Version isn't valid!")
 
-# Unpack only the Display Driver from an NVIDIA Driver Package.
-def unpack(driver_file, dir = getcwd(), components = []):
+# Extract only the Display Driver from an NVIDIA Driver Package.
+def extract(driver_file, output = getcwd(), components = []):
     for index, component in enumerate(components):
         match component.lower():
             case 'audio': components[index] = 'HDAudio'
             case _: components.pop(index)
     components += BASE_COMPONENTS
 
-    dir = f'{dir}/{path.split(path.splitext(driver_file)[0])[1]}'
+    output = f'{output}/{path.split(path.splitext(driver_file)[0])[1]}'
 
     try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
         print("Error: Couldn't find (7z.exe)!")
         exit() 
 
-    if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {""" """.join(components).strip()} -o"{dir}"').returncode == 0:
-        with open(f'{dir}/setup.cfg', 'r+', encoding='UTF') as file:
+    if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {""" """.join(components).strip()} -o"{output}"').returncode == 0:
+        with open(f'{output}/setup.cfg', 'r+', encoding='UTF') as file:
             content = file.read().splitlines(); file.seek(0)
             for line in file.read().splitlines():
                 if line.strip() in SETUP: content.pop(content.index(line))
-        with open(f'{dir}/setup.cfg', 'w', encoding = 'UTF-8') as file: file.write('\n'.join(content))                        
-        print(f'Unpacked to "{Path(path.abspath(dir))}"')
+        with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as file: file.write('\n'.join(content))                        
+        print(f'extracted to "{Path(path.abspath(output))}"')
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False) -> None:
