@@ -36,7 +36,7 @@ def main():
                          help='Set the driver type to Standard.')
     driver_options.add_argument('--full', '-f',
                         action = 'store_true',
-                        help='Sets the package type to Full.')                       
+                        help='Sets the driver package type to Full.')                       
     options.add_argument('--output', '-o',
                         nargs = '?',
                         default = gettempdir(), 

@@ -11,7 +11,7 @@ This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
 6. `--output <Directory>` | Specify the output directory.    
 `--output` | Set the output directory to the current working directory.
 7. `--update` | Check if the currently installed NVIDIA driver is outdated or not.
-8. `--full` | Sets the package type to Full.
+8. `--full` | Sets the driver package type to Full.
 9. `--components [Components]` | Specify which components to include when extracting a driver package.
 
 # Wiki
