@@ -10,6 +10,7 @@ from fnmatch import fnmatch
 from subprocess import run
 from sys import exit
 from utils import *
+from ast import literal_eval
 
 # Functions
 
@@ -62,7 +63,7 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', output
                 case 'laptop': driver_links = GR_DESKTOP_LINKS[type] 
                 case 'desktop': driver_links = GR_NOTEBOOK_LINKS[type]    
     filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
-    
+
     print('Checking Download...')
     for index, driver_link in enumerate(driver_links):
         try:
@@ -109,12 +110,14 @@ def update(studio_drivers = False, full = False) -> None:
     if studio_drivers: print('Type: Studio')
     else: print('Type: Game Ready')
     installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
-    if installed_driver_version == get_driver_versions(studio_drivers = studio_drivers)[0]:
+    if literal_eval(installed_driver_version) == literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
         print('The latest driver has been installed.')
-    else:
-        print('Your current driver is outdated! Please update!') 
-        while True:
-            option = input('Update? (Y/N): ')
-            if option.lower().strip() in ('y','yes', ''):
-                download(full = full, studio_drivers = studio_drivers); break
-            elif option.lower().strip() in ('n', 'no'): print("The latest driver won't be downloaded."); break    
+        exit()
+    elif literal_eval(installed_driver_version) > literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
+        texts = ('Do you want to downgrade your driver?', 'Downgrade?', "The currently installed driver will not be downgraded.")
+    else: texts = ('Your current driver is outdated! Please update!', 'Update?', "The latest driver won't be downloaded.")     
+    print(texts[0]) 
+    while True:
+        option = input(f'{texts[1]} (Y/N): ')
+        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers); break
+        elif option.lower().strip() in ('n', 'no'): print(texts[2]); break    
