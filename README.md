@@ -14,6 +14,9 @@ This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
 8. `--full` | Sets the package type to Full.
 9. `--components [Components]` | Specify which components to include when extracting a driver package.
 
+# Wiki
+### Check out NVDDL's Documentation/Wiki: [Documentation/Wiki](https://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki)
+
 # Releases
 **Find pre-compiled binaries here:**             
 [GitHub Releases](https://github.com/Aetopia/NVIDIA-Driver-Downloader/releases)
