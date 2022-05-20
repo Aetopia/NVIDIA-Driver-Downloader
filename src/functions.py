@@ -118,6 +118,6 @@ def update(studio_drivers = False, full = False) -> None:
     else: texts = ('Your current driver is outdated! Please update!', 'Update?', "The latest driver won't be downloaded.")     
     print(texts[0]) 
     while True:
-        option = input(f'{texts[1]} (Y/N): ')
+        option = input(f'{texts[1]} (Y/N) > ')
         if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers); break
         elif option.lower().strip() in ('n', 'no'): print(texts[2]); break    
