@@ -18,6 +18,10 @@ This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
 ### Check out NVDDL's Documentation/Wiki: [Documentation/Wiki](https://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki)
 
 # Releases
+**Install via Scoop**
+```ps
+scoop install https://raw.githubusercontent.com/couleur-tweak-tips/utils/main/bucket/nvddl.json
+```
 **Find pre-compiled binaries here:**             
 [GitHub Releases](https://github.com/Aetopia/NVIDIA-Driver-Downloader/releases)
 
