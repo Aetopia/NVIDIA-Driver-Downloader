@@ -83,7 +83,7 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', output
                 print("Error: Version isn't valid!")
 
 # Extract only the Display Driver from an NVIDIA Driver Package.
-def extract(driver_file, output = getcwd(), components = []):
+def extract(driver_file, output = getcwd(), components: list = []):
     for index, component in enumerate(components):
         match component.lower():
             case 'audio': components[index] = 'HDAudio'
@@ -103,7 +103,7 @@ def extract(driver_file, output = getcwd(), components = []):
             for line in file.read().splitlines():
                 if line.strip() in SETUP: content.pop(content.index(line))
         with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as file: file.write('\n'.join(content))                        
-        print(f'extracted to "{Path(path.abspath(output))}"')
+        print(f'Extracted to "{Path(path.abspath(output))}"')
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False, full = False) -> None:
