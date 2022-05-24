@@ -84,13 +84,15 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', output
                 print("Error: Version isn't valid!")
 
 # Extract only the Display Driver from an NVIDIA Driver Package.
-def extract(driver_file, output = getcwd(), components: list = []):
-    for index, component in enumerate(components):
-        match component.lower():
-            case 'audio': components[index] = 'HDAudio'
-            case 'physx': components[index] = 'PhysX'
-            case _: components.pop(index)
-    components += BASE_COMPONENTS
+def extract(driver_file, output = getcwd(), components: list = [], full = False):
+    if full is False:
+        for index, component in enumerate(components):
+            match component.lower():
+                case 'audio': components[index] = 'HDAudio'
+                case 'physx': components[index] = 'PhysX'
+                case _: components.pop(index)
+        components += BASE_COMPONENTS        
+    else: components = []            
 
     output = f'{output}/{path.split(path.splitext(driver_file)[0])[1]}'
     
@@ -123,6 +125,6 @@ def update(studio_drivers = False, full = False, components: list = []) -> None:
     print(texts[0]) 
 
     while True:
-        option = input(f'{texts[1]} (Y/N) > ')
+        option = input(f'{texts[1]} (Y/N) > '); print()
         if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, components = components); break
         elif option.lower().strip() in ('n', 'no'): print(texts[2]); break    
