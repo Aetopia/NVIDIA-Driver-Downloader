@@ -79,7 +79,7 @@ def main():
             print(f'Extracting ({path.split(args.extract[0])[1]})...')
             extract(args.extract[0], output = args.output, components = args.components)   
 
-        elif args.update is True: update(studio_drivers = args.studio)  
+        elif args.update is True: update(studio_drivers = args.studio, components = args.components)  
 
         elif args.download is not None:
             print(f'Downloading {driver_type} Driver...')

@@ -1,4 +1,5 @@
 # Modules
+from shutil import rmtree
 from constants import * # constants.py
 from os import getcwd, makedirs, path
 from tempfile import gettempdir
@@ -37,7 +38,7 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
-def download(driver_version = None, studio_drivers = False, type = 'dch', output = gettempdir(), full = False, components = ()):
+def download(driver_version = None, studio_drivers = False, type = 'dch', output = gettempdir(), full = False, components: list = []):
     if type == 'dch': type = 'DCH';print('Type: DCH')
     elif type == 'std': type = 'STD';print('Type: Standard')
     if full: print('Package: Full')
@@ -73,7 +74,7 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', output
                     raise KeyboardInterrupt
                 if full is False: 
                     print('Trying to extract the downloaded Driver Package...')
-                    extract(f"{filepath}.exe", output, components = components)
+                    extract(f"{filepath}.exe", components = components, output = output)
                     file = f'{filepath}/setup.exe'
                 elif full is True: file = f'{filepath}.exe'
                 Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT)    
@@ -87,17 +88,19 @@ def extract(driver_file, output = getcwd(), components: list = []):
     for index, component in enumerate(components):
         match component.lower():
             case 'audio': components[index] = 'HDAudio'
+            case 'physx': components[index] = 'PhysX'
             case _: components.pop(index)
     components += BASE_COMPONENTS
 
     output = f'{output}/{path.split(path.splitext(driver_file)[0])[1]}'
-
+    
+    if path.exists(output): rmtree(output)
     try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
         print("Error: Couldn't find (7z.exe)!")
         exit() 
 
-    if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {""" """.join(components).strip()} -o"{output}"').returncode == 0:
+    if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"').returncode == 0:
         with open(f'{output}/setup.cfg', 'r+', encoding='UTF') as file:
             content = file.read().splitlines(); file.seek(0)
             for line in file.read().splitlines():
@@ -106,10 +109,11 @@ def extract(driver_file, output = getcwd(), components: list = []):
         print(f'Extracted to "{Path(path.abspath(output))}"')
 
 # Check if your NVIDIA driver is outdated or not.
-def update(studio_drivers = False, full = False) -> None:
+def update(studio_drivers = False, full = False, components: list = []) -> None:
     if studio_drivers: print('Type: Studio')
     else: print('Type: Game Ready')
     installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
+
     if literal_eval(installed_driver_version) == literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
         print('The latest driver has been installed.')
         exit()
@@ -117,7 +121,8 @@ def update(studio_drivers = False, full = False) -> None:
         texts = ('Do you want to downgrade your driver?', 'Downgrade?', "The currently installed driver will not be downgraded.")
     else: texts = ('Your current driver is outdated! Please update!', 'Update?', "The latest driver won't be downloaded.")     
     print(texts[0]) 
+
     while True:
         option = input(f'{texts[1]} (Y/N) > ')
-        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers); break
+        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, components = components); break
         elif option.lower().strip() in ('n', 'no'): print(texts[2]); break    
