@@ -26,19 +26,23 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     driver_versions = ()
 
     with urlopen(link) as file:
-        file = [line.decode('UTF-8').strip() for line in file]      
+        file = [line.decode('UTF-8').strip() for line in file] 
+
     for line in file:
         if fnmatch(line, '<td class="gridItem">*.*</td>'):
             driver_version = line.split('>')[1].split('<')[0]
-            if driver_version != '':
-                driver_versions += driver_version,  
+            if driver_version != '': driver_versions += driver_version,  
+
     if len(driver_versions) == 0:
         print("Error: Couldn't find any valid driver versions.")
-        exit()                  
+        exit(1)                  
     return driver_versions             
 
 # Download an NVIDIA Driver Package.
-def download(driver_version = None, studio_drivers = False, type = 'dch', output = gettempdir(), full = False, components: list = []):
+def download(driver_version = None, studio_drivers = False, 
+             type = 'dch', output = gettempdir(), 
+             full = False, components: list = []):
+
     if type == 'dch': type = 'DCH';print('Type: DCH')
     elif type == 'std': type = 'STD';print('Type: Standard')
     if full: print('Package: Full')
@@ -65,43 +69,48 @@ def download(driver_version = None, studio_drivers = False, type = 'dch', output
                 case 'desktop': driver_links = GR_NOTEBOOK_LINKS[type]    
     filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
 
-    print('Checking Download...')
+    print('Checking Links...')
     for index, driver_link in enumerate(driver_links):
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
-                print('Version is valid, now downloading NVIDIA Driver Package...')
-                if run(f'curl.exe -# "{driver_link}" -o "{output}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])).returncode != 0:
-                    raise KeyboardInterrupt
-                if full is False: 
-                    print('Trying to extract the downloaded Driver Package...')
-                    extract(f"{filepath}.exe", components = components, output = output)
-                    file = f'{filepath}/setup.exe'
-                elif full is True: file = f'{filepath}.exe'
-                Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT)    
-                break           
+                print('Queried version is valid, now downloading NVIDIA driver package...')
+                if run(f'curl.exe -# "{driver_link}" -o "{output}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
+                    if full is False: 
+                        print('Trying to extract the downloaded driver package...')
+                        extract(f"{filepath}.exe", components = components, output = output)
+                        file = f'{filepath}/setup.exe'
+                    elif full is True: 
+                        file = f'{filepath}.exe'
+                        print(f'Downloaded to "{Path(filepath)}.exe"')
+                    Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT)    
+                    break           
         except HTTPError:
             if index == len(driver_links)-1:
-                print("Error: Version isn't valid!")
+                print("Error: Queried version isn't valid!")
+                exit(1)
 
-# Extract only the Display Driver from an NVIDIA Driver Package.
-def extract(driver_file, output = getcwd(), components: list = [], full = False):
+# Extract a driver package with the specified components.
+def extract(driver_file, output = gettempdir(), components: list = [], full = False):
+    if path.isfile(driver_file) is False:
+        print("Error: Specified input is not a file.")
+        exit(1) 
+
     if full is False:
         for index, component in enumerate(components):
             match component.lower():
                 case 'audio': components[index] = 'HDAudio'
                 case 'physx': components[index] = 'PhysX'
-                case _: components.pop(index)
+                case _: print('Error: Invalid component(s) specified.'); exit(1)
         components += BASE_COMPONENTS        
-    else: components = []            
+    else: components = []     
 
     output = f'{output}/{path.split(path.splitext(driver_file)[0])[1]}'
-    
     if path.exists(output): rmtree(output)
+
     try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
     except IndexError:
         print("Error: Couldn't find (7z.exe)!")
-        exit() 
-
+        exit(1) 
     if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"').returncode == 0:
         with open(f'{output}/setup.cfg', 'r+', encoding='UTF') as file:
             content = file.read().splitlines(); file.seek(0)
@@ -109,6 +118,8 @@ def extract(driver_file, output = getcwd(), components: list = [], full = False)
                 if line.strip() in SETUP: content.pop(content.index(line))
         with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as file: file.write('\n'.join(content))                        
         print(f'Extracted to "{Path(path.abspath(output))}"')
+        Popen(f'"{output}/setup.exe"', shell=True, stdout = DEVNULL, stderr = STDOUT)
+    else: print('Error: Something went wrong while extracting the specified driver package.')   
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False, full = False, components: list = []) -> None:

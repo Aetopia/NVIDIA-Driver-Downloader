@@ -76,7 +76,7 @@ def main():
             print('\n'.join(get_driver_versions(studio_drivers = args.studio, type = type)))
 
         elif args.extract is not None:
-            print(f'Extracting ({path.split(args.extract[0])[1]})...')
+            print(f'Extracting ({path.split(args.extract[0])[1].strip()})...')
             extract(args.extract[0], output = args.output, components = args.components, full = args.full)   
 
         elif args.update is True: update(studio_drivers = args.studio, components = args.components)  
@@ -85,14 +85,19 @@ def main():
             print(f'Downloading {driver_type} Driver...')
             driver_version = args.download
             print(f'Version: {driver_version}')
-            download(driver_version = driver_version , studio_drivers = args.studio, type = type, output = args.output, full = args.full, components = args.components)
+            download(driver_version = driver_version , studio_drivers = args.studio, 
+                     type = type, output = args.output, 
+                     full = args.full, components = args.components)
+                     
         elif args.download is None:
             print(f'Downloading the Latest {driver_type} Driver...')
-            download(studio_drivers = args.studio, type = type, output = args.output, full = args.full, components = args.components)  
+            download(studio_drivers = args.studio, type = type, 
+                     output = args.output, 
+                     full = args.full, components = args.components)  
     else: parser.print_help()
 
 if __name__ == '__main__':
     try: main()
     except KeyboardInterrupt:
         print('\nWarning: Operation cancelled.')
-        exit()           
+        exit(1)           
