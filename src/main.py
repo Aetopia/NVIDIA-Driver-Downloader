@@ -77,7 +77,7 @@ def main():
 
         elif args.extract is not None:
             print(f'Extracting ({path.split(args.extract[0])[1].strip()})...')
-            extract(args.extract[0], output = args.output, components = args.components, full = args.full)   
+            extract(args.extract[0], output = args.output, components = args.components, full = args.full, setup = True)   
 
         elif args.update is True: update(studio_drivers = args.studio, components = args.components)  
 

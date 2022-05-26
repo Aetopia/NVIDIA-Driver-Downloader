@@ -90,7 +90,7 @@ def download(driver_version = None, studio_drivers = False,
                 exit(1)
 
 # Extract a driver package with the specified components.
-def extract(driver_file, output = gettempdir(), components: list = [], full = False):
+def extract(driver_file, output = gettempdir(), components: list = [], full = False, setup = False):
     if path.isfile(driver_file) is False:
         print("Error: Specified input is not a file.")
         exit(1) 
@@ -118,7 +118,7 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
                 if line.strip() in SETUP: content.pop(content.index(line))
         with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as file: file.write('\n'.join(content))                        
         print(f'Extracted to "{Path(path.abspath(output))}"')
-        Popen(f'"{output}/setup.exe"', shell=True, stdout = DEVNULL, stderr = STDOUT)
+        if setup: Popen(f'"{output}/setup.exe"', shell=True, stdout = DEVNULL, stderr = STDOUT)
     else: print('Error: Something went wrong while extracting the specified driver package.')   
 
 # Check if your NVIDIA driver is outdated or not.
