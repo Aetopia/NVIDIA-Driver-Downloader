@@ -1,9 +1,9 @@
 # Modules
 from shutil import rmtree
 from constants import * # constants.py
-from os import getcwd, makedirs, path
+from os import makedirs, path
 from tempfile import gettempdir
-from subprocess import Popen, DEVNULL, STDOUT
+from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
 from urllib.request import urlopen 
 from urllib.error import HTTPError
 from pathlib import Path
@@ -83,7 +83,7 @@ def download(driver_version = None, studio_drivers = False,
                         file = f'{filepath}.exe'
                         if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(file)}"'
                         print(f'Downloaded to "{Path(filepath)}.exe"')
-                        Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = filepath)    
+                        Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = filepath, creationflags = DETACHED_PROCESS)    
                     break           
         except HTTPError:
             if index == len(driver_links)-1:
@@ -119,7 +119,7 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
             with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as setup_cfg: setup_cfg.write('\n'.join(content))                        
         print(f'Extracted to "{Path(path.abspath(output))}"')
         if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
-        Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = output)
+        Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = output, creationflags = DETACHED_PROCESS)
     else: print('Error: Something went wrong while extracting the specified driver package.')   
 
 # Check if your NVIDIA driver is outdated or not.
