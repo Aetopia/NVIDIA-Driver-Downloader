@@ -1,6 +1,7 @@
 # NVIDIA Driver Downloader
 Allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with 🐍 Python!                     
 This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
+
 # Usage:
 1. `--download <Driver Version>` | Download a specified driver version.     
 `--download` | Download the latest driver.
@@ -23,9 +24,10 @@ This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
 scoop install https://raw.githubusercontent.com/couleur-tweak-tips/utils/main/bucket/nvddl.json
 ```
 **Find pre-compiled binaries here:**             
-[GitHub Releases](https://github.com/Aetopia/NVIDIA-Driver-Downloader/releases)
-
+[GitHub Releases](https://github.com/Aetopia/NVIDIA-Driver-Downloader/releases)      
+**NOTE: Make sure to have 7-Zip installed your system or driver extraction functionalities won't work!**
 # Requirements
+External PIP Packages used by NVIDIA Driver Downloader:
 ```
 pip install wmi
 ```

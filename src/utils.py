@@ -1,6 +1,10 @@
-from wmi import WMI
-from fnmatch import fnmatch
+from wmi import WMI 
+from xml.etree import ElementTree
 from urllib.request import urlopen
+from subprocess import run
+from pathlib import Path
+from tempfile import gettempdir
+from os import path
 from sys import exit
 
 # Get PSID and PFID of the installed NVIDIA GPU.
@@ -21,12 +25,9 @@ def get_gpu() -> tuple:
 # Parse the GPU List XML file into a dictionary.
 def gpus() -> dict:
     response = {}
-    with urlopen('https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=3') as file:
-        lines = [line.decode('UTF-8').strip() for line in file.read().splitlines()]
-    for x, y in enumerate(lines):
-        if fnmatch(y, f'<Name>*</Name>'): 
-            if y.split('<Name>')[1].split('</Name>')[0] not in response.keys():
-                response[y.split('<Name>')[1].split('</Name>')[0]] = {'PSID':lines[x-1].split('LookupValue ParentID="')[1].split('">')[0], 'PFID':lines[x+1].split('<')[1].split('>')[1]}
+    xml = ElementTree.parse(urlopen('https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=3')).getroot()
+    for index, tag in enumerate(xml.findall('LookupValues/LookupValue')):
+        response[tag[0].text] =  {'PSID': str(index), 'PFID':tag[1].text}
     return response
 
 # Detect if the device being used is a laptop or desktop. (Thanks Felipe#5555! :3)
@@ -39,3 +40,22 @@ def system_type() -> str:
     else:
         print("Error: Couldn't detect system type.")
         exit()                         
+
+def get_drives():
+    drives = ()
+    for drive in WMI().Win32_LogicalDisk():
+        drives += f'{drive.DeviceID}\\',
+    return drives    
+
+def get_archiver():
+    drives = get_drives()
+    returncode = None
+    try:
+        for drive in drives:
+            for archiver in Path(drive).rglob('*7z.exe'):
+                try: returncode = run(archiver, capture_output = True).returncode
+                except FileNotFoundError or OSError: returncode = None    
+                if returncode == 0: break
+            if returncode == 0: break  
+        return archiver        
+    except UnboundLocalError: print("Error: Couldn't find a usable archiving program."); exit()                

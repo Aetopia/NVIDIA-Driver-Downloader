@@ -27,7 +27,8 @@ def main():
                             metavar='<Driver File>')   
     arguments.add_argument('--update', '-u',
                         action = 'store_true',
-                        help = 'Check if the installed NVIDIA driver is outdated or not.')                                             
+                        help = 'Check if the installed NVIDIA driver is outdated or not.')  
+
     driver_options.add_argument('--studio', '-stu',
                         action = 'store_true', 
                         help = 'Set the driver type to Studio.')
@@ -36,7 +37,11 @@ def main():
                          help='Set the driver type to Standard.')
     driver_options.add_argument('--full', '-f',
                         action = 'store_true',
-                        help='Sets the driver package type to Full.')                       
+                        help='Sets the driver package type to Full.')   
+    driver_options.add_argument('--setup', '-s',
+                        action = 'store_true',
+                        help = 'Run the extracted driver package setup.')   
+                                                             
     options.add_argument('--output', '-o',
                         nargs = '?',
                         default = gettempdir(), 
@@ -48,18 +53,14 @@ def main():
                         metavar = ('Component', 'Components'),
                         default = [],
                         nargs = '+',
-                        help = 'Select which components to include in an extracted driver package.')                                                        
+                        help = 'Select which components to include in an extracted driver package.')  
     args = parser.parse_args()
 
     if len(argv) != 1: 
-        if not ('-dl' in argv \
-           or '--download' in argv \
-           or '-u' in argv \
-           or '--update' in argv \
-           or '--extract' in argv \
-           or '-e' in argv \
-           or '-ls' in argv \
-           or '--list' in argv):
+        if not ('-dl' in argv or '--download' in argv \
+           or '-u' in argv or '--update' in argv \
+           or '--extract' in argv or '-e' in argv \
+           or '-ls' in argv or '--list' in argv):
            parser.print_usage() 
            print('Error: Options must be used with arguments.')
            exit()    
@@ -77,23 +78,25 @@ def main():
 
         elif args.extract is not None:
             print(f'Extracting ({path.split(args.extract[0])[1].strip()})...')
-            extract(args.extract[0], output = args.output, components = args.components, full = args.full, setup = True)   
+            extract(args.extract[0], output = args.output, 
+                    components = args.components, 
+                    full = args.full, setup = args.setup)   
 
-        elif args.update is True: update(studio_drivers = args.studio, components = args.components)  
+        elif args.update is True: update(studio_drivers = args.studio, components = args.components, setup = args.setup)  
 
         elif args.download is not None:
             print(f'Downloading {driver_type} Driver...')
             driver_version = args.download
             print(f'Version: {driver_version}')
-            download(driver_version = driver_version , studio_drivers = args.studio, 
+            download(driver_version = driver_version, studio_drivers = args.studio, 
                      type = type, output = args.output, 
-                     full = args.full, components = args.components)
+                     full = args.full, components = args.components, setup = args.setup)
                      
         elif args.download is None:
             print(f'Downloading the Latest {driver_type} Driver...')
             download(studio_drivers = args.studio, type = type, 
-                     output = args.output, 
-                     full = args.full, components = args.components)  
+                     output = args.output, full = args.full, 
+                     components = args.components, setup = args.setup)  
     else: parser.print_help()
 
 if __name__ == '__main__':

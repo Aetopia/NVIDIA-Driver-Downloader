@@ -41,8 +41,9 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
 # Download an NVIDIA Driver Package.
 def download(driver_version = None, studio_drivers = False, 
              type = 'dch', output = gettempdir(), 
-             full = False, components: list = []):
-
+             full = False, components: list = [],
+             setup = False) -> None:
+    
     if type == 'dch': type = 'DCH';print('Type: DCH')
     elif type == 'std': type = 'STD';print('Type: Standard')
     if full: print('Package: Full')
@@ -74,15 +75,15 @@ def download(driver_version = None, studio_drivers = False,
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
                 print('Queried version is valid, now downloading NVIDIA driver package...')
-                if run(f'curl.exe -# "{driver_link}" -o "{output}/{type} {prefix} - {driver_versions[0]}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
+                if run(f'curl.exe -# "{driver_link}" -o "{filepath}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
                     if full is False: 
                         print('Trying to extract the downloaded driver package...')
-                        extract(f"{filepath}.exe", components = components, output = output)
-                        file = f'{filepath}/setup.exe'
+                        extract(f"{filepath}.exe", components = components, output = output, setup = setup)
                     elif full is True: 
                         file = f'{filepath}.exe'
+                        if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(file)}"'
                         print(f'Downloaded to "{Path(filepath)}.exe"')
-                    Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT)    
+                        Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = filepath)    
                     break           
         except HTTPError:
             if index == len(driver_links)-1:
@@ -105,24 +106,24 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
     else: components = []     
 
     output = f'{output}/{path.split(path.splitext(driver_file)[0])[1]}'
+    file = f'{output}/setup.exe'
     if path.exists(output): rmtree(output)
 
-    try: archiver = tuple(Path('C:\\').rglob('*7z.exe'))[0]
-    except IndexError:
-        print("Error: Couldn't find (7z.exe)!")
-        exit(1) 
+    archiver = get_archiver()
     if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"').returncode == 0:
-        with open(f'{output}/setup.cfg', 'r+', encoding='UTF') as file:
-            content = file.read().splitlines(); file.seek(0)
-            for line in file.read().splitlines():
-                if line.strip() in SETUP: content.pop(content.index(line))
-        with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as file: file.write('\n'.join(content))                        
+        if full is False:
+            with open(f'{output}/setup.cfg', 'r+', encoding='UTF-8') as setup_cfg:
+                content = setup_cfg.read().splitlines(); setup_cfg.seek(0)
+                for line in setup_cfg.read().splitlines():
+                    if line.strip() in SETUP: content.pop(content.index(line))
+            with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as setup_cfg: setup_cfg.write('\n'.join(content))                        
         print(f'Extracted to "{Path(path.abspath(output))}"')
-        if setup: Popen(f'"{output}/setup.exe"', shell=True, stdout = DEVNULL, stderr = STDOUT)
+        if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
+        Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = output)
     else: print('Error: Something went wrong while extracting the specified driver package.')   
 
 # Check if your NVIDIA driver is outdated or not.
-def update(studio_drivers = False, full = False, components: list = []) -> None:
+def update(studio_drivers = False, full = False, components: list = [], setup = False) -> None:
     if studio_drivers: print('Type: Studio')
     else: print('Type: Game Ready')
     installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
@@ -137,5 +138,5 @@ def update(studio_drivers = False, full = False, components: list = []) -> None:
 
     while True:
         option = input(f'{texts[1]} (Y/N) > '); print()
-        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, components = components); break
+        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, components = components, setup =  setup); break
         elif option.lower().strip() in ('n', 'no'): print(texts[2]); break    
