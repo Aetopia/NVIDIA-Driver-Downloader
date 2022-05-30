@@ -1,4 +1,11 @@
+"""
+This file contains WIP and experimental code.
 
+What has been added:
+1. Hardware based detection of the GPU.
+2. Optimized get_psid_pfid() function.
+3. Using PCIIDs to get the GPU name.
+"""
 from wmi import WMI
 from urllib.request import urlopen
 from utils import gpus
@@ -21,6 +28,9 @@ def get_psid_pfid() -> tuple:
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']        
         
 def get_gpu():    
+    """
+    Get the GPU name using a Hardware ID.
+    """
     vendor_filter = '10DE'
     devices = ()
     for driver in WMI().Win32_PnPSignedDriver():
@@ -41,7 +51,10 @@ def get_gpu():
         else: return gpu
 
 def pciids():
-    json = {}
+    """
+    Parse the PCIIDs file into a dictionary.
+    """
+    response = {}
     for line in urlopen('https://raw.githubusercontent.com/pciutils/pciids/master/pci.ids').read().decode('UTF-8').splitlines():
         try:
             if line.startswith('#') is False:
@@ -49,21 +62,20 @@ def pciids():
                 # Devices
                 if ('\t') == tuple(line)[0] and ('\t') != tuple(line)[1]: 
                     device, device_name = line.strip('\t').split(' ' * 2, 1)
-                    json[vendor.upper()][1][device.upper()] = device_name
+                    response[vendor.upper()][1][device.upper()] = device_name
 
                 # Subvendors + Subdevices + Subsystems
                 if ('\t', '\t') == tuple(line)[0:2]: 
                     subvendor_subdevice, subsystem_name = line.strip('\t').strip().split(' ' * 2, 1)
                     try: 
                         subvendor, subdevice = subvendor_subdevice.split()
-                        json[vendor.upper()][1][subvendor.upper()] = {subdevice.upper(): subsystem_name}
-                    except ValueError: json[vendor.upper()][1][subvendor_subdevice.upper()] = subsystem_name
+                        response[vendor.upper()][1][subvendor.upper()] = {subdevice.upper(): subsystem_name}
+                    except ValueError: response[vendor.upper()][1][subvendor_subdevice.upper()] = subsystem_name
 
                 # Vendors
                 elif ('\t') != tuple(line)[0] and 'C' != tuple(line)[0]:
                     vendor, vendor_name = line.split(' ' * 2, 1)
-                    json[vendor.upper()] = [vendor_name, {}]
+                    response[vendor.upper()] = [vendor_name, {}]
 
         except IndexError: pass  
-
-    return json
+    return response
