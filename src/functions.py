@@ -12,6 +12,13 @@ from subprocess import run
 from sys import exit
 from utils import *
 from ast import literal_eval
+'-----------------------------------------------------------------------------------------------------------------------'
+"""
+Experimental
+Enable Experimental Flags by uncommenting imports.
+"""
+# from experimental import get_psid_pfid 
+'-----------------------------------------------------------------------------------------------------------------------'
 
 # Functions
 
@@ -21,7 +28,7 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     else: whql = 1
     if type.lower() == 'dch': dtcid = 1
     elif type.lower() == 'std': dtcid = 0
-    psid, pfid = get_gpu()
+    psid, pfid = get_psid_pfid()
     link = API_LINK.format(psid = psid, pfid = pfid, whql = whql, dtcid = dtcid)
     driver_versions = ()
 

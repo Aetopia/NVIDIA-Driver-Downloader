@@ -3,12 +3,10 @@ from xml.etree import ElementTree
 from urllib.request import urlopen
 from subprocess import run
 from pathlib import Path
-from tempfile import gettempdir
-from os import path
 from sys import exit
 
 # Get PSID and PFID of the installed NVIDIA GPU.
-def get_gpu() -> tuple:
+def get_psid_pfid() -> tuple:
     gpu_list = gpus()
     IS_NOT_NVIDIA = False
     for detected_gpus in WMI().Win32_VideoController():
@@ -54,7 +52,8 @@ def get_archiver():
         for drive in drives:
             for archiver in Path(drive).rglob('*7z.exe'):
                 try: returncode = run(archiver, capture_output = True).returncode
-                except FileNotFoundError or OSError: returncode = None    
+                except FileNotFoundError: returncode = None   
+                except OSError: returncode = None    
                 if returncode == 0: break
             if returncode == 0: break  
         return archiver        
