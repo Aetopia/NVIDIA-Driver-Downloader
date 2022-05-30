@@ -27,7 +27,7 @@ def main():
                             metavar='<Driver File>')   
     arguments.add_argument('--update', '-u',
                         action = 'store_true',
-                        help = 'Check if the installed NVIDIA driver is outdated or not.')  
+                        help = 'Check if the currently installed NVIDIA driver is outdated or not.')  
 
     driver_options.add_argument('--studio', '-stu',
                         action = 'store_true', 
