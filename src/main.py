@@ -14,6 +14,7 @@ def main():
     arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group()
     driver_options = parser.add_argument_group('Driver Options')
     options = parser.add_argument_group('Options')
+    
     arguments.add_argument('--list', '-ls',
                             action = 'store_true', 
                             help = 'Show all available driver versions.')
