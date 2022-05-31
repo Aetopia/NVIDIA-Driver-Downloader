@@ -36,11 +36,10 @@ def get_gpu():
     for driver in WMI().Win32_PnPSignedDriver():
         try:
             hwid = driver.HardwareID.split('PCI\\')[1].split('VEN_')[1].split('&')
-            vendor, device = hwid[0], hwid[1].split('DEV_')[1]
-            if vendor == vendor_filter: 
-                # 3D Video Controller is the driver installed when no suitable driver is found or installed for the given GPU.
-                if driver.DeviceClass == 'DISPLAY' or driver.DeviceName == '3D Video Controller': 
-                    devices += device,
+            vendor, device = hwid[0], hwid[1].split('DEV_')[1] 
+            # 3D Video Controller is the driver installed when no suitable driver is found or installed for the given GPU.
+            if vendor == vendor_filter and (driver.DeviceClass == 'DISPLAY' or driver.DeviceName == '3D Video Controller'): 
+                devices += device,
         except AttributeError: pass 
         except IndexError: pass
     for device in devices:
