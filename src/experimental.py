@@ -9,7 +9,7 @@ What has been added:
 from wmi import WMI
 from urllib.request import urlopen
 from utils import gpus
-
+from colors import printc
 print('Warning: Experimental Mode is enabled, this may cause instability.')
 """
 NVIDIA Family -> '10DE'
@@ -24,7 +24,7 @@ def get_psid_pfid() -> tuple:
             return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
     else: IS_NOT_NVIDIA = True
     if IS_NOT_NVIDIA: 
-        print('No NVIDIA GPU Detected: Using Fallback Mode.')
+        printc('&URL@LREDWarning: No NVIDIA GPU detected, using fallback mode.\n')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']        
         
 def get_gpu():    
@@ -44,7 +44,7 @@ def get_gpu():
         except IndexError: pass
     for device in devices:
         try: gpu = pciids()['10DE'][1][device]
-        except KeyError: print('Error: No NVIDIA GPU Detected.'); exit()
+        except KeyError: printc('@LREDError: No NVIDIA GPU Detected.'); exit()
         if dict == type(gpu):
             return tuple(gpu.values())[0]
         else: return gpu

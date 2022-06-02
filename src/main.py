@@ -3,58 +3,69 @@
 # Discord: https://dsc.gg/CTT
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
+from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from functions import *
+from colors import printc, formatc
 from os import getcwd, path
 from sys import argv, exit
 from tempfile import gettempdir
 
 def main():
-    parser = ArgumentParser(description = 'A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!')
-    arguments = parser.add_argument_group('Arguments').add_mutually_exclusive_group()
-    driver_options = parser.add_argument_group('Driver Options')
-    options = parser.add_argument_group('Options')
+    parser = ArgumentParser(description = formatc(PROGRAM_DESCRIPTION), 
+    formatter_class = RawDescriptionHelpFormatter, add_help=False, usage=SUPPRESS)
+
+    parser.add_argument('--help', action = 'help', help = SUPPRESS)
+
+    arguments = parser.add_argument_group(title = ' Arguments', 
+    description = HELP_ARGUMENTS).add_mutually_exclusive_group()
+
+    driver_options = parser.add_argument_group(title = ' Driver Options',
+    description = HELP_DRIVER_OPTIONS)
+
+    options = parser.add_argument_group(title = ' Options',
+    description = HELP_OPTIONS)
     
     arguments.add_argument('--list', '-ls',
                             action = 'store_true', 
-                            help = 'Show all available driver versions.')
+                            help = SUPPRESS)
     arguments.add_argument('--download', '-dl',
                             nargs = '?',
-                            help = 'Download the latest driver or a specified driver version.',
+                            help = SUPPRESS,
                             metavar='Driver Version')
     arguments.add_argument('--extract', '-e',
                             nargs = 1,
-                            help = 'Extract the specified driver package.',
+                            help = SUPPRESS,
                             metavar='<Driver File>')   
     arguments.add_argument('--update', '-u',
                         action = 'store_true',
-                        help = 'Check if the currently installed NVIDIA driver is outdated or not.')  
+                        help = SUPPRESS)  
 
     driver_options.add_argument('--studio', '-stu',
                         action = 'store_true', 
-                        help = 'Set the driver type to Studio.')
+                        help = SUPPRESS)
     driver_options.add_argument('--standard', '-std',
                          action = 'store_true',
-                         help='Set the driver type to Standard.')
+                         help = SUPPRESS)
     driver_options.add_argument('--full', '-f',
                         action = 'store_true',
-                        help='Sets the driver package type to Full.')   
+                        help = SUPPRESS)   
     driver_options.add_argument('--setup', '-s',
                         action = 'store_true',
-                        help = 'Run the extracted driver package setup.')   
+                        help = SUPPRESS)   
                                                              
     options.add_argument('--output', '-o',
                         nargs = '?',
                         default = gettempdir(), 
                         action='store', 
-                        help = 'Specify the output directory.', 
+                        help = SUPPRESS, 
                         metavar = 'Directory')  
     options.add_argument('--components','-c',
                         action = 'store',
                         metavar = ('Component', 'Components'),
                         default = [],
                         nargs = '+',
-                        help = 'Select which components to include in an extracted driver package.')  
+                        help = SUPPRESS)  
     args = parser.parse_args()
 
     if len(argv) != 1: 
@@ -63,7 +74,7 @@ def main():
            or '--extract' in argv or '-e' in argv \
            or '-ls' in argv or '--list' in argv):
            parser.print_usage() 
-           print('Error: Options must be used with arguments.')
+           printc('@LREDError: Options must be used with arguments.')
            exit()    
         if args.output is None: args.output = getcwd()
         match args.studio: 
@@ -74,11 +85,15 @@ def main():
             case False: type = 'dch'; driver_type = f'DCH {driver_type}'
 
         if args.list is True: 
-            print(f'{driver_type} Drivers:')
-            print('\n'.join(get_driver_versions(studio_drivers = args.studio, type = type)))
-
+            printc(f'@LYELLOW{driver_type} Drivers:')
+            driver_versions = get_driver_versions(studio_drivers = args.studio, type = type)
+            for index, driver_version in enumerate(driver_versions):
+                if index == 0: printc(f' @LGREEN~ {driver_version}') 
+                elif index+1 == len(driver_versions): printc(f' @LVIOLET# {driver_version}')
+                else: printc(f' @LBEIGE> {driver_version}')
+                
         elif args.extract is not None:
-            print(f'Extracting ({path.split(args.extract[0])[1].strip()})...')
+            printc(f'@LYELLOWExtracting ({path.split(args.extract[0])[1].strip()})...')
             extract(args.extract[0], output = args.output, 
                     components = args.components, 
                     full = args.full, setup = args.setup)   
@@ -86,22 +101,23 @@ def main():
         elif args.update is True: update(studio_drivers = args.studio, components = args.components, setup = args.setup)  
 
         elif args.download is not None:
-            print(f'Downloading {driver_type} Driver...')
+            printc(f'@LYELLOWDownloading {driver_type} Driver...')
             driver_version = args.download
-            print(f'Version: {driver_version}')
+            printc(f'@LYELLOWVersion: {driver_version}')
             download(driver_version = driver_version, studio_drivers = args.studio, 
                      type = type, output = args.output, 
                      full = args.full, components = args.components, setup = args.setup)
                      
         elif args.download is None:
-            print(f'Downloading the Latest {driver_type} Driver...')
+            printc(f'@LYELLOWDownloading the Latest {driver_type} Driver...')
             download(studio_drivers = args.studio, type = type, 
                      output = args.output, full = args.full, 
                      components = args.components, setup = args.setup)  
-    else: parser.print_help()
+    else: 
+        parser.print_help()
 
 if __name__ == '__main__':
     try: main()
     except KeyboardInterrupt:
-        print('\nWarning: Operation cancelled.')
+        printc('@LRED\nWarning: Operation cancelled.')
         exit(1)           

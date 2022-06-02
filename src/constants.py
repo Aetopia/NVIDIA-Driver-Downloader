@@ -48,3 +48,28 @@ SETUP = ('<file name="${{EulaHtmlFile}}"/>',
 
 # Version Key
 REG_KEY = r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver" /v DisplayVersion'
+
+# Help 
+HELP_ARGUMENTS = '''--list, -ls                      │ Show all available driver versions.
+--download, -dl <Driver Version> │ Download the latest driver or a specified driver version.
+--extract, -e <Driver File>      │ Extract the specified driver package.
+--update, -u                     │ Check if the currently installed NVIDIA driver is outdated or not.'''
+
+HELP_DRIVER_OPTIONS = '''--studio, -stu   │ Set the driver type to Studio.
+--standard, -std │ Set the driver type to Standard.
+--full, -f       │ Sets the driver package type to Full.
+--setup, -s      │ Run the extracted driver package setup.'''
+
+HELP_OPTIONS = '''--output, -o <Directory>          │ Specify the output directory.
+--components, -c [Components ...] │ Select which components to include in an extracted driver package.'''
+
+PROGRAM_DESCRIPTION = ''' 
+ @LGREEN┌──────────────────────────┐ 
+ │@ NVIDIA Driver Downloader│
+ └──────────────────────────┘&RESET
+
+ A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!
+
+ GitHub Repository: &URL@LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader&RESET
+
+ NVDDL Docs/Wiki: &URL@LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki'''
