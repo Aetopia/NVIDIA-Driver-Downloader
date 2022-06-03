@@ -37,7 +37,7 @@ def system_type() -> str:
     elif type in (3, 4, 5, 6, 7, 15, 16):
         return 'desktop'
     else:
-        print("Error: Couldn't detect system type.")
+        printc("@LREDError: Couldn't detect system type.")
         exit()                         
 
 def get_drives():
