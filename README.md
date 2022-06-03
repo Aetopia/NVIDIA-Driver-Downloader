@@ -1,6 +1,8 @@
-# NVIDIA Driver Downloader
-Allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with 🐍 Python!                     
-This tool is aimed at Windows 10+ and modern NVIDIA GPUs.
+<h1 align="center">NVIDIA Driver Downloader</h1>
+<p align="center"><img src="https://user-images.githubusercontent.com/41850963/171687399-f35017ba-8457-40c8-8e34-0916805967eb.png"</p>
+
+<p align="center">Allows you to download NVIDIA Game Ready and Studio drivers via the command-line!</p> 
+<p align="center">Made with 🐍 Python!</p>                     
 
 # Usage:
 1. `--download <Driver Version>` | Download a specified driver version.     
