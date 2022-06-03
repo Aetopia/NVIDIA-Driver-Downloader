@@ -58,4 +58,4 @@ def get_archiver():
                 if returncode == 0: break
             if returncode == 0: break  
         return archiver        
-    except UnboundLocalError: print("Error: Couldn't find a usable archiving program."); exit()                
+    except UnboundLocalError: printc("@LREDErrorError: Couldn't find a usable archiving program."); exit()                
