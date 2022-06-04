@@ -6,13 +6,13 @@
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
 from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from functions import *
-from colors import printc, formatc
+from colors import printc, getc
 from os import getcwd, path
 from sys import argv, exit
 from tempfile import gettempdir
 
 def main():
-    parser = ArgumentParser(description = formatc(PROGRAM_DESCRIPTION), 
+    parser = ArgumentParser(description = getc(PROGRAM_DESCRIPTION), 
     formatter_class = RawDescriptionHelpFormatter, add_help=False, usage=SUPPRESS)
 
     parser.add_argument('--help', action = 'help', help = SUPPRESS)

@@ -70,6 +70,6 @@ PROGRAM_DESCRIPTION = '''
 
  A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!
 
- GitHub Repository: &URL@LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader&RESET
+ GitHub Repository: @LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader&RESET
 
- NVDDL Docs/Wiki: &URL@LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki'''
+ NVDDL Docs/Wiki: @LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki&RESET'''

@@ -1,28 +1,30 @@
 """
-Simple Module for Terminal Colors
-credits: Atzur & Woofina
+simple module for terminal colors
+credits: atzur & woofina
 https://github.com/atzuur
 https://github.com/WoofinaS
 """
 
+from os import system; system('')
 from re import findall
-from os import system
-system('')
 
 # & == method
 # @ == foreground
 # $ == background
 
+# * == incompatible with windows
+# ** == incompatible with default windows terminals (works in vscode terminal etc)
+
 codes = { '&RESET'    : '\33[0m',
-          '&BOLD'     : '\33[1m',
-          '&ITALIC'   : '\33[3m',
+          '&BOLD'     : '\33[1m', # **
+          '&ITALIC'   : '\33[3m', # **
           '&URL'      : '\33[4m',
-          '&BLINK'    : '\33[5m',
-          '&ALTBLINK' : '\33[6m',
+          '&BLINK'    : '\33[5m', # *
+          '&ALTBLINK' : '\33[6m', # *
           '&SELECTED' : '\33[7m',
           '&INVISIBLE': '\33[8m',
-          '&STRIKE'   : '\33[9m',
-          '@RGB'      : '\33[38;2;',
+          '&STRIKE'   : '\33[9m', # **
+          '@RGB('      : '\33[38;2;',
           '@BLACK'    : '\33[30m',
           '@RED'      : '\33[31m',
           '@GREEN'    : '\33[32m',
@@ -39,7 +41,7 @@ codes = { '&RESET'    : '\33[0m',
           '@LVIOLET'  : '\33[95m',
           '@LBEIGE'   : '\33[96m',
           '@LWHITE'   : '\33[97m',
-          '$RGB'      : '\33[48;2;',
+          '$RGB('      : '\33[48;2;',
           '$BLACK'    : '\33[40m',
           '$RED'      : '\33[41m',
           '$GREEN'    : '\33[42m',
@@ -58,71 +60,89 @@ codes = { '&RESET'    : '\33[0m',
           '$LWHITE'   : '\33[107m' }
 
 
-def printc (text: str):
-    print(formatc(text))
+def printc (text: str, end: str = '\n'):
+    print(getc(text))
+
 
 def inputc (text: str):
-    return input(formatc(text))
+    return input(getc(text))
 
-def formatc (text: str):
+
+def getc (text: str):
 
     formatted = text
 
     for key in list(codes):
         if key in formatted:
-            formatted = formatted.replace(key, codes[key])
 
-    formatted = formatted + codes['&RESET']
+            if key == '@RGB(' or key == '$RGB(': # rgb syntax: @RGB(r,g,b){text}
 
-    return formatted
+                endparen = formatted.index(')', formatted.index(key)) # get index of closing paren
+                if endparen is None: continue # skip if invalid syntax
+
+                spacing = len(codes[key]) - len(key) # insertion offset, '\33[38;2;' is longer than @RGB(
+                formatted = formatted.replace(key, codes[key])
+
+                # replace closing paren with 'm' (required for color)
+                formatted = formatted[:endparen + spacing] + 'm' + formatted[endparen + spacing + 1:] 
+
+            else: formatted = formatted.replace(key, codes[key])
+
+    return formatted + codes['&RESET']
 
 
-def print_success (text     : str,
-                   prefix   : str = 'SUCCESS',
-                   isolate  : bool = False,
-                   noprefix : bool = False):
+def print_success (text       : str,
+                   prefix     : str = 'SUCCESS',
+                   isolate    : bool = False,
+                   noprefix   : bool = False,
+                   printend   : str = '\n',
+                   pre_prefix : str = ''): # add text before prefix
 
-    out = formatc(f'@LGREEN{text}')
+    out = getc(f'@LGREEN{text}')
 
     if not noprefix:
-        out = formatc(f'@WHITE[&BOLD@GREEN{prefix}&RESET@WHITE] >>> ') + out
+        out = getc(f'@WHITE[&BOLD@GREEN{prefix}&RESET@WHITE] >>> ') + out
 
     if isolate:
         out = '\n' + out + '\n'
 
-    print(out)
+    print(pre_prefix + out, end=printend)
 
 
-def print_error (text     : str,
-                 prefix   : str = 'ERROR',
-                 isolate  : bool = False,
-                 noprefix : bool = False):
+def print_error (text       : str,
+                 prefix     : str = 'ERROR',
+                 isolate    : bool = False,
+                 noprefix   : bool = False,
+                 printend   : str = '\n',
+                 pre_prefix : str = ''):
 
-    out = formatc(f'@LRED{text}')
+    out = getc(f'@LRED{text}')
 
     if not noprefix:
-        out = formatc(f'@WHITE[&BOLD@RED{prefix}&RESET@WHITE] >>>') + out
+        out = getc(f'@WHITE[&BOLD@RED{prefix}&RESET@WHITE] >>> ') + out
 
     if isolate:
         out = '\n' + out + '\n'
 
-    print(out)
+    print(pre_prefix + out, end=printend)
 
 
-def print_warning (text     : str,
-                   prefix   : str = 'WARNING',
-                   isolate  : bool = False,
-                   noprefix : bool = False):
+def print_warning (text       : str,
+                   prefix     : str = 'WARNING',
+                   isolate    : bool = False,
+                   noprefix   : bool = False,
+                   printend   : str = '\n',
+                   pre_prefix : str = ''):
 
-    out = formatc(f'@YELLOW{text}')
+    out = getc(f'@YELLOW{text}')
 
     if not noprefix:
-        out = formatc(f'@WHITE[&BOLD@YELLOW{prefix}&RESET@WHITE] >>>') + out
+        out = getc(f'@WHITE[&BOLD@YELLOW{prefix}&RESET@WHITE] >>> ') + out
 
     if isolate:
         out = '\n' + out + '\n'
 
-    print(out)
+    print(pre_prefix + out, end=printend)
 
 
 def print_rainbow (text      : str | list | tuple,
@@ -208,7 +228,6 @@ def syntax_hl (text: str):
         else: hl[idx] = dflt + char + r
 
     return ''.join(hl) + r
-
 
 
 ### WIP ###
