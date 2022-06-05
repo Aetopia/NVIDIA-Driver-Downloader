@@ -137,5 +137,5 @@ def main():
 if __name__ == '__main__':
     try: main()
     except KeyboardInterrupt:
-        printc('@LRED\nWarning: Operation cancelled.')
+        printc('@LREDWarning: Operation cancelled.')
         exit(1)           

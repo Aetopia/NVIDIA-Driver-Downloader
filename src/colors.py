@@ -61,7 +61,7 @@ codes = { '&RESET'    : '\33[0m',
 
 
 def printc (text: str, end: str = '\n'):
-    print(getc(text))
+    print(getc(text), end = end)
 
 
 def inputc (text: str):
