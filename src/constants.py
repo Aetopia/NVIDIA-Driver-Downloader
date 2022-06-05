@@ -62,7 +62,7 @@ HELP_DRIVER_OPTIONS = '''--studio, -stu                     │ Set the driver t
 --components, -c [Components ...]  │ Select which components to include in an extracted driver package.'''
 
 HELP_OPTIONS = '''--output, -o <Directory>           │ Specify the output directory.
---flags [Flags ...]                │ Flags to pass to NVDDL.'''
+--flags [Flags ...]                │ Pass flags to NVDDL.'''
 
 PROGRAM_DESCRIPTION = ''' 
  @LGREEN┌──────────────────────────┐ 

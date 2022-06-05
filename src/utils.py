@@ -11,7 +11,7 @@ def get_psid_pfid() -> tuple:
     gpu_list = gpus()
     IS_NOT_NVIDIA = False
     for detected_gpus in WMI().Win32_VideoController():
-        detected_gpu = detected_gpus.wmi_property('Caption').value
+        detected_gpu = detected_gpus.Caption
         if 'nvidia' in detected_gpu.lower():
             for gpu in gpu_list.keys():
                 if gpu in detected_gpu:

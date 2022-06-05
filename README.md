@@ -17,6 +17,7 @@
 8. `--full` | Sets the driver package type to Full.
 9. `--components [Components]` | Specify which components to include when extracting a driver package.
 10. `--setup` | Run the extracted driver package setup.
+11. `--flags` | Pass flags to NVDDL.
 
 # Wiki
 ### Check out NVDDL's Documentation/Wiki: [Documentation/Wiki](https://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki)
