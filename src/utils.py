@@ -38,7 +38,7 @@ def system_type() -> str:
         return 'desktop'
     else:
         printc("@LREDError: Couldn't detect system type.")
-        exit()                         
+        exit(1)                         
 
 def get_drives():
     drives = ()
@@ -58,4 +58,4 @@ def get_archiver():
                 if returncode == 0: break
             if returncode == 0: break  
         return archiver        
-    except UnboundLocalError: printc("@LREDErrorError: Couldn't find a usable archiving program."); exit()                
+    except UnboundLocalError: printc("@LREDErrorError: Couldn't find a usable archiving program."); exit(1)                

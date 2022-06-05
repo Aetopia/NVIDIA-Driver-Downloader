@@ -25,7 +25,7 @@ def flags(flags: list = []) -> None:
                     flags_verbose += '@LBLUEFlag: Hardware ID Detection',
                     global get_psid_pfid;from flags import get_psid_pfid     
 
-                case _: printc(f'@LREDError: Invalid Flag > {flag}'); exit() 
+                case _: printc(f'@LREDError: Invalid Flag > {flag}'); exit(1) 
 
         printc('@LREDWarning: Using Flags!')        
         for text in flags_verbose: printc(text)
@@ -148,7 +148,7 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
 
     if literal_eval(installed_driver_version) == literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
         printc('@LGREENThe latest driver has been installed.')
-        exit()
+        exit(1)
     elif literal_eval(installed_driver_version) > literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
         texts = ('@LBLUEDo you want to downgrade your driver?', '@LBLUEDowngrade?', "@LREDThe currently installed driver will not be downgraded.")
     else: texts = ('@LBLUEYour current driver is outdated! Please update!', '@LBLUEUpdate?', "@LREDThe latest driver won't be downloaded.")     
