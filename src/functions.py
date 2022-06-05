@@ -13,13 +13,23 @@ from sys import exit
 from utils import *
 from ast import literal_eval
 from colors import printc, inputc
-'-----------------------------------------------------------------------------------------------------------------------'
-"""
-Experimental
-Enable Experimental Flags by uncommenting imports.
-"""
-# from experimental import get_psid_pfid 
-'-----------------------------------------------------------------------------------------------------------------------'
+
+# Flags -> Enables or replaces certain functions.
+def flags(flags: list = []) -> None:
+    if flags != []: 
+        flags_verbose = ()
+        for flag in flags:
+            match flag.lower():
+
+                case 'hwid-detect': 
+                    flags_verbose += '@LBLUEFlag: Hardware ID Detection',
+                    global get_psid_pfid;from flags import get_psid_pfid     
+
+                case _: printc(f'@LREDError: Invalid Flag > {flag}'); exit() 
+
+        printc('@LREDWarning: Using Flags!')        
+        for text in flags_verbose: printc(text)
+        print()
 
 # Functions
 
@@ -146,5 +156,6 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
 
     while True:
         option = inputc(f'{texts[1]} (Y/N) > '); print()
-        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, components = components, setup =  setup); break
-        elif option.lower().strip() in ('n', 'no'): printc(texts[2]); break    
+        if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, 
+                                                               components = components, setup =  setup); break
+        elif option.lower().strip() in ('n', 'no'): printc(texts[2]); break

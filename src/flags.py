@@ -10,7 +10,6 @@ from wmi import WMI
 from urllib.request import urlopen
 from utils import gpus
 from colors import printc
-print('Warning: Experimental Mode is enabled, this may cause instability.')
 """
 NVIDIA Family -> '10DE'
 Device Type -> 'DISPLAY'
