@@ -1,5 +1,5 @@
 <h1 align="center">NVIDIA Driver Downloader</h1>
-<p align="center"><img src="https://user-images.githubusercontent.com/41850963/171990687-575861e6-f135-445c-abcf-87966fea6440.png"</p>
+<p align="center"><img src="https://user-images.githubusercontent.com/41850963/172037114-c9c08d28-d483-4bac-9588-6948a8915c06.png"</p>
 
 <p align="center">Allows you to download NVIDIA Game Ready and Studio drivers via the command-line!</p> 
 <p align="center">Made with 🐍 Python!</p>                     
@@ -17,7 +17,7 @@
 8. `--full` | Sets the driver package type to Full.
 9. `--components [Components]` | Specify which components to include when extracting a driver package.
 10. `--setup` | Run the extracted driver package setup.
-11. `--flags` | Pass flags to NVDDL.
+11. `--flags [Flags ...]` | Pass flags to NVDDL.
 
 # Wiki
 ### Check out NVDDL's Documentation/Wiki: [Documentation/Wiki](https://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki)
