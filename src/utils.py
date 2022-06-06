@@ -4,7 +4,7 @@ from urllib.request import urlopen
 from subprocess import run
 from pathlib import Path
 from sys import exit
-from colors import printc
+from textformat import *
 
 # Get PSID and PFID of the installed NVIDIA GPU.
 def get_psid_pfid() -> tuple:
@@ -20,7 +20,7 @@ def get_psid_pfid() -> tuple:
         else: IS_NOT_NVIDIA = True
 
     if IS_NOT_NVIDIA: 
-        printc('&URL@LREDWarning: No NVIDIA GPU detected, using fallback mode.\n')
+        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.\n'+eol)
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
     
 # Parse the GPU List XML file into a dictionary.
@@ -39,7 +39,7 @@ def system_type() -> str:
     elif type in (3, 4, 5, 6, 7, 15, 16):
         return 'desktop'
     else:
-        printc("@LREDError: Couldn't detect system type.")
+        print(f"{fg.lred}Error: Couldn't detect system type."+eol)
         exit(1)                         
 
 def get_drives():
@@ -62,4 +62,4 @@ def get_archiver():
                 if returncode == 0: break
             if returncode == 0: break
         return archiver        
-    except UnboundLocalError: printc("@LREDErrorError: Couldn't find a usable archiving program."); exit(1)                
+    except UnboundLocalError: print(f"{fg.lred}Error: Couldn't find a usable archiving program."+eol); exit(1)                

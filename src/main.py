@@ -6,14 +6,14 @@
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
 from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from functions import *
-from colors import printc, getc
+from textformat import *
 from os import getcwd, path
 from sys import argv, exit
 from tempfile import gettempdir
 from traceback import print_exc
 
 def main():
-    parser = ArgumentParser(description = getc(PROGRAM_DESCRIPTION), 
+    parser = ArgumentParser(description = PROGRAM_DESCRIPTION, 
     formatter_class = RawDescriptionHelpFormatter,
     add_help=False, usage=SUPPRESS)
 
@@ -92,7 +92,7 @@ def main():
            or '--extract' in argv or '-e' in argv \
            or '-ls' in argv or '--list' in argv):
            parser.print_usage() 
-           printc('@LREDError: Options must be used with arguments.')
+           print(f'{fg.lred}Error: Options must be used with arguments.'+eol)
            exit()   
 
         if args.output is None: args.output = getcwd()
@@ -105,16 +105,16 @@ def main():
             case False: type = 'dch'; driver_type = f'DCH {driver_type}'   
 
         if args.list is True: 
-            printc(f'@LYELLOW{driver_type} Drivers:')
+            print(f'{fg.lyellow}{driver_type} Drivers:'+eol)
             driver_versions = get_driver_versions(studio_drivers = args.studio, type = type)
 
             for index, driver_version in enumerate(driver_versions):
-                if index == 0: printc(f' @LGREEN~ {driver_version}') 
-                elif index+1 == len(driver_versions): printc(f' @LVIOLET# {driver_version}')
-                else: printc(f' @LBEIGE> {driver_version}')
+                if index == 0: print(f' {fg.lgreen}~ {driver_version}'+eol) 
+                elif index+1 == len(driver_versions): print(f' {fg.lviolet}# {driver_version}'+eol)
+                else: print(f' {fg.lbeige}> {driver_version}'+eol)
                 
         elif args.extract is not None:
-            printc(f'@LYELLOWExtracting ({path.split(args.extract[0])[1].strip()})...')
+            print(f'{fg.lyellow}Extracting ({path.split(args.extract[0])[1].strip()})...'+eol)
             extract(args.extract[0], output = args.output, 
                     components = args.components, 
                     full = args.full, setup = args.setup)   
@@ -122,16 +122,16 @@ def main():
         elif args.update is True: update(studio_drivers = args.studio, components = args.components, setup = args.setup)  
 
         elif args.download is not None:
-            printc(f'@LYELLOWDownloading {driver_type} Driver...')
+            print(f'{fg.lyellow}Downloading {driver_type} Driver...'+eol)
             driver_version = args.download
-            printc(f'@LYELLOWVersion: {driver_version}')
+            print(f'{fg.lyellow}Version: {driver_version}'+eol)
 
             download(driver_version = driver_version, studio_drivers = args.studio, 
                      type = type, output = args.output, 
                      full = args.full, components = args.components, setup = args.setup)
                      
         elif args.download is None:
-            printc(f'@LYELLOWDownloading the Latest {driver_type} Driver...')
+            print(f'{fg.lyellow}Downloading the Latest {driver_type} Driver...'+eol)
             
             download(studio_drivers = args.studio, type = type, 
                      output = args.output, full = args.full, 
@@ -141,5 +141,5 @@ def main():
 
 if __name__ == '__main__':
     try: main()
-    except KeyboardInterrupt: printc('@LREDWarning: Operation cancelled.');exit(1)
-    except: printc('\n@LREDAn Error has occurred:');print_exc();exit()           
+    except KeyboardInterrupt: print(f'{fg.lred}Warning: Operation cancelled.'+eol);exit(1)
+    except: print(f'\n{fg.lred}An Error has occurred:'+eol);print_exc();exit()           

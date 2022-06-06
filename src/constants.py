@@ -1,3 +1,4 @@
+from textformat import *
 # Download Links for Drivers (Static)
 STUDIO_DESKTOP_LINKS = {
     'DCH':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-nsd-dch-whql.exe',
@@ -64,13 +65,13 @@ HELP_DRIVER_OPTIONS = '''--studio, -stu                     │ Set the driver t
 HELP_OPTIONS = '''--output, -o <Directory>           │ Specify the output directory.
 --flags [Flags ...]                │ Pass flags to NVDDL.'''
 
-PROGRAM_DESCRIPTION = ''' 
- @LGREEN┌──────────────────────────┐ 
+PROGRAM_DESCRIPTION = f''' 
+ {fg.lgreen}┌──────────────────────────┐ 
  │@ NVIDIA Driver Downloader│
- └──────────────────────────┘&RESET
+ └──────────────────────────┘{eol}
 
  A tool that allows you to download NVIDIA Game Ready and Studio drivers via the command-line. Made with Python!
 
- GitHub Repository: @LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader&RESET
+ GitHub Repository: {fg.lblue}https://github.com/Aetopia/NVIDIA-Driver-Downloader{eol}
 
- NVDDL Docs/Wiki: @LBLUEhttps://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki&RESET'''
+ NVDDL Docs/Wiki: {fg.lblue}https://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki{eol}'''
