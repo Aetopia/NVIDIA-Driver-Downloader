@@ -10,6 +10,7 @@ from colors import printc
 def get_psid_pfid() -> tuple:
     gpu_list = gpus()
     IS_NOT_NVIDIA = False
+
     for detected_gpus in WMI().Win32_VideoController():
         detected_gpu = detected_gpus.Caption
         if 'nvidia' in detected_gpu.lower():
@@ -17,6 +18,7 @@ def get_psid_pfid() -> tuple:
                 if gpu in detected_gpu:
                     return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
         else: IS_NOT_NVIDIA = True
+
     if IS_NOT_NVIDIA: 
         printc('&URL@LREDWarning: No NVIDIA GPU detected, using fallback mode.\n')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
@@ -52,10 +54,12 @@ def get_archiver():
     try:
         for drive in drives:
             for archiver in Path(drive).rglob('*7z.exe'):
+
                 try: returncode = run(archiver, capture_output = True).returncode
                 except FileNotFoundError: returncode = None   
                 except OSError: returncode = None    
+
                 if returncode == 0: break
-            if returncode == 0: break  
+            if returncode == 0: break
         return archiver        
     except UnboundLocalError: printc("@LREDErrorError: Couldn't find a usable archiving program."); exit(1)                

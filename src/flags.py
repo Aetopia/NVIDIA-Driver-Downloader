@@ -18,10 +18,12 @@ def get_psid_pfid() -> tuple:
     gpu_list = gpus()
     IS_NOT_NVIDIA = False
     detected_gpu = get_gpu()
+
     for gpu in gpu_list.keys():
         if gpu in detected_gpu:
             return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
     else: IS_NOT_NVIDIA = True
+
     if IS_NOT_NVIDIA: 
         printc('&URL@LREDWarning: No NVIDIA GPU detected, using fallback mode.\n')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']        
@@ -32,6 +34,7 @@ def get_gpu():
     """
     vendor_filter = '10DE'
     devices = ()
+    
     for driver in WMI().Win32_PnPSignedDriver():
         try:
             hwid = driver.HardwareID.split('PCI\\')[1].split('VEN_')[1].split('&')
@@ -41,11 +44,12 @@ def get_gpu():
                 devices += device,
         except AttributeError: pass 
         except IndexError: pass
+
     for device in devices:
         try: gpu = pciids()['10DE'][1][device]
         except KeyError: printc('@LREDError: No NVIDIA GPU Detected.'); exit(1)
-        if dict == type(gpu):
-            return tuple(gpu.values())[0]
+
+        if dict == type(gpu): return tuple(gpu.values())[0]
         else: return gpu
 
 def pciids():

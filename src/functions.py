@@ -37,8 +37,10 @@ def flags(flags: list = []) -> None:
 def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
     if studio_drivers: whql = 4
     else: whql = 1
+
     if type.lower() == 'dch': dtcid = 1
     elif type.lower() == 'std': dtcid = 0
+
     psid, pfid = get_psid_pfid()
     link = API_LINK.format(psid = psid, pfid = pfid, whql = whql, dtcid = dtcid)
     driver_versions = ()
@@ -80,12 +82,14 @@ def download(driver_version = None, studio_drivers = False,
             prefix = 'Studio'
             match system_type(): 
                 case 'laptop': driver_links = STUDIO_DESKTOP_LINKS[type]
-                case 'desktop': driver_links = STUDIO_NOTEBOOK_LINKS[type]     
+                case 'desktop': driver_links = STUDIO_NOTEBOOK_LINKS[type] 
+
         case False:
             prefix = 'Game Ready'
             match system_type():
                 case 'laptop': driver_links = GR_DESKTOP_LINKS[type] 
-                case 'desktop': driver_links = GR_NOTEBOOK_LINKS[type]    
+                case 'desktop': driver_links = GR_NOTEBOOK_LINKS[type] 
+
     filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
 
     printc('@LBEIGEChecking Links...')
@@ -93,16 +97,19 @@ def download(driver_version = None, studio_drivers = False,
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
                 printc('@LBEIGEQueried version is valid, now downloading NVIDIA driver package...')
+
                 if run(f'curl.exe -# "{driver_link}" -o "{filepath}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
                     if full is False: 
                         printc('@LBEIGETrying to extract the downloaded driver package...')
                         extract(f"{filepath}.exe", components = components, output = output, setup = setup)
+
                     elif full is True: 
                         file = f'{filepath}.exe'
                         if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(file)}"'
                         printc(f'@LGREENDownloaded to "{Path(filepath)}.exe"')
                         Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = filepath, creationflags = DETACHED_PROCESS)    
-                    break           
+                    break  
+
         except HTTPError:
             if index == len(driver_links)-1:
                 printc("@LREDError: Queried version isn't valid!")
@@ -114,6 +121,7 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
         printc("@LREDError: Specified input is not a file.")
         exit(1) 
 
+    # Initialize
     if full is False:
         for index, component in enumerate(components):
             match component.lower():
@@ -127,21 +135,29 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
     file = f'{output}/setup.exe'
     if path.exists(output): rmtree(output)
 
+    # Extract
     archiver = get_archiver()
     if run(f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"').returncode == 0:
+
         if full is False:
             with open(f'{output}/setup.cfg', 'r+', encoding='UTF-8') as setup_cfg:
                 content = setup_cfg.read().splitlines(); setup_cfg.seek(0)
                 for line in setup_cfg.read().splitlines():
                     if line.strip() in SETUP: content.pop(content.index(line))
-            with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as setup_cfg: setup_cfg.write('\n'.join(content))                        
+
+            with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as setup_cfg: 
+                setup_cfg.write('\n'.join(content))  
+
         printc(f'@LGREENExtracted to "{Path(path.abspath(output))}"')
+
         if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
         Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = output, creationflags = DETACHED_PROCESS)
+
     else: printc('@LREDError: Something went wrong while extracting the specified driver package.')   
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False, full = False, components: list = [], setup = False) -> None:
+    
     if studio_drivers: printc('@LYELLOWType: Studio')
     else: printc('@LYELLOWType: Game Ready')
     installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
@@ -149,9 +165,17 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
     if literal_eval(installed_driver_version) == literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
         printc('@LGREENThe latest driver has been installed.')
         exit(1)
+
     elif literal_eval(installed_driver_version) > literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
-        texts = ('@LBLUEDo you want to downgrade your driver?', '@LBLUEDowngrade?', "@LREDThe currently installed driver will not be downgraded.")
-    else: texts = ('@LBLUEYour current driver is outdated! Please update!', '@LBLUEUpdate?', "@LREDThe latest driver won't be downloaded.")     
+        texts = (
+            '@LBLUEDo you want to downgrade your driver?', 
+            '@LBLUEDowngrade?', 
+            "@LREDThe currently installed driver will not be downgraded.")
+
+    else: texts = (
+            '@LBLUEYour current driver is outdated! Please update!', 
+            '@LBLUEUpdate?', 
+            "@LREDThe latest driver won't be downloaded.")     
     printc(texts[0]) 
 
     while True:

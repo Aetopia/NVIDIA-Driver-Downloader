@@ -10,6 +10,7 @@ from colors import printc, getc
 from os import getcwd, path
 from sys import argv, exit
 from tempfile import gettempdir
+from traceback import print_exc
 
 def main():
     parser = ArgumentParser(description = getc(PROGRAM_DESCRIPTION), 
@@ -98,6 +99,7 @@ def main():
         match args.studio: 
             case True: driver_type = 'Studio'   
             case False: driver_type = 'Game Ready' 
+
         match args.standard:
             case True: type = 'std'; driver_type = f'Standard {driver_type}'
             case False: type = 'dch'; driver_type = f'DCH {driver_type}'   
@@ -105,6 +107,7 @@ def main():
         if args.list is True: 
             printc(f'@LYELLOW{driver_type} Drivers:')
             driver_versions = get_driver_versions(studio_drivers = args.studio, type = type)
+
             for index, driver_version in enumerate(driver_versions):
                 if index == 0: printc(f' @LGREEN~ {driver_version}') 
                 elif index+1 == len(driver_versions): printc(f' @LVIOLET# {driver_version}')
@@ -122,12 +125,14 @@ def main():
             printc(f'@LYELLOWDownloading {driver_type} Driver...')
             driver_version = args.download
             printc(f'@LYELLOWVersion: {driver_version}')
+
             download(driver_version = driver_version, studio_drivers = args.studio, 
                      type = type, output = args.output, 
                      full = args.full, components = args.components, setup = args.setup)
                      
         elif args.download is None:
             printc(f'@LYELLOWDownloading the Latest {driver_type} Driver...')
+            
             download(studio_drivers = args.studio, type = type, 
                      output = args.output, full = args.full, 
                      components = args.components, setup = args.setup)  
@@ -136,6 +141,5 @@ def main():
 
 if __name__ == '__main__':
     try: main()
-    except KeyboardInterrupt:
-        printc('@LREDWarning: Operation cancelled.')
-        exit(1)           
+    except KeyboardInterrupt: printc('@LREDWarning: Operation cancelled.');exit(1)
+    except: printc('\n@LREDAn Error has occurred:');print_exc();exit()           
