@@ -140,6 +140,5 @@ def main():
         parser.print_help()
 
 if __name__ == '__main__':
-    try: main()
-    except KeyboardInterrupt: print(f'{fg.lred}Warning: Operation cancelled.'+eol);exit(1)
-    except: print(f'\n{fg.lred}An Error has occurred:'+eol);print_exc();exit()           
+    try: main(); exit(0)
+    except KeyboardInterrupt: print(f'{fg.lred}Warning: Operation cancelled.'+eol);exit(1)         

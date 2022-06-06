@@ -163,8 +163,7 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
     installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
 
     if literal_eval(installed_driver_version) == literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
-        print(f'{fg.lgreen}The latest driver has been installed.'+eol)
-        exit(1)
+        print(f'{fg.lgreen}The latest driver has been installed.'+eol); exit(0)
 
     elif literal_eval(installed_driver_version) > literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
         texts = (
