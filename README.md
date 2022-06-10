@@ -31,6 +31,7 @@ scoop install https://raw.githubusercontent.com/couleur-tweak-tips/utils/main/bu
 [GitHub Releases](https://github.com/Aetopia/NVIDIA-Driver-Downloader/releases)      
 **NOTE: Make sure to have 7-Zip installed your system or driver extraction functionalities won't work!**
 # Requirements
+**Note: Only required if you are dealing with the source code.**
 External PIP Packages used by NVIDIA Driver Downloader:
 ```
 pip install wmi

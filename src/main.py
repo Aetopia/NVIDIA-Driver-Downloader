@@ -8,9 +8,9 @@ from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM
 from functions import *
 from textformat import *
 from os import getcwd, path
-from sys import argv, exit
+from sys import argv, exit; import sys
 from tempfile import gettempdir
-from traceback import print_exc
+
 
 def main():
     parser = ArgumentParser(description = PROGRAM_DESCRIPTION, 
@@ -82,10 +82,16 @@ def main():
                          metavar = ('Flag','Flags'),
                          nargs = '+',
                          default = [],
-                         help = SUPPRESS)   
+                         help = SUPPRESS)  
+
+    parser.add_argument('--no-stdout',
+                        action='store_true',
+                        help=SUPPRESS)                    
 
     args = parser.parse_args()
     flags(args.flags)
+    if args.no_stdout: sys.stdout = None
+
     if len(argv) != 1: 
         if not ('-dl' in argv or '--download' in argv \
            or '-u' in argv or '--update' in argv \
@@ -141,4 +147,4 @@ def main():
 
 if __name__ == '__main__':
     try: main(); exit(0)
-    except KeyboardInterrupt: print(f'{fg.lred}Warning: Operation cancelled.'+eol);exit(1)         
+    except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.'+eol);exit(1)       
