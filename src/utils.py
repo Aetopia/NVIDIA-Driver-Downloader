@@ -1,5 +1,6 @@
 from wmi import WMI 
 from xml.etree import ElementTree
+from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumValue
 from urllib.request import urlopen
 from subprocess import run
 from pathlib import Path
@@ -47,6 +48,20 @@ def get_drives():
     for drive in WMI().Win32_LogicalDisk():
         drives += f'{drive.DeviceID}\\',
     return drives    
+
+def get_installed_driver_version() -> float:
+    try: query_key = OpenKey(HKEY_LOCAL_MACHINE, 
+                             r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
+    except FileNotFoundError: print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.'+eol); exit(1)    
+    index = 0
+    while True:
+        try:
+            key, value, _ = EnumValue(query_key, index)
+            if key == 'DisplayVersion':
+                try: return float(value)
+                except ValueError: print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.'+eol); exit(1)
+        except OSError: break     
+        index += 1
 
 def get_archiver():
     drives = get_drives()

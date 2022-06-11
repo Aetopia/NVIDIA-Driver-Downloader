@@ -47,9 +47,6 @@ SETUP = ('<file name="${{EulaHtmlFile}}"/>',
          '<file name="${{PrivacyPolicyFile}}"/>', 
          '<file name="${{FunctionalConsentFile}}"/>')
 
-# Version Key
-REG_KEY = r'reg query "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver" /v DisplayVersion'
-
 # Help 
 HELP_ARGUMENTS = '''--list, -ls                        │ Show all available driver versions.
 --download, -dl <Driver Version>   │ Download the latest driver or a specified driver version.

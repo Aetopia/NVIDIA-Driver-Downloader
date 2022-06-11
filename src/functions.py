@@ -160,12 +160,13 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
     
     if studio_drivers: print(f'{fg.lyellow}Type: Studio'+eol)
     else: print(f'{fg.lyellow}Type: Game Ready'+eol)
-    installed_driver_version = run(REG_KEY, capture_output = True).stdout.decode('UTF-8').split(' ')[-1].split('\r')[0]
+    latest_driver_versions = literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0])
+    installed_driver_version = get_installed_driver_version()
 
-    if literal_eval(installed_driver_version) == literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
+    if installed_driver_version == latest_driver_versions:
         print(f'{fg.lgreen}The latest driver has been installed.'+eol); exit(0)
 
-    elif literal_eval(installed_driver_version) > literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0]):
+    elif installed_driver_version > latest_driver_versions:
         texts = (
             f'{fg.lblue}Do you want to downgrade your driver?', 
             f'{fg.lblue}Downgrade?', 
@@ -179,7 +180,7 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
 
     while True:
         try: option = input(f'{texts[1]} (Y/N) > '+eol); print()
-        except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.'+eol);exit(1)  
+        except KeyboardInterrupt: option = 'n'; print(); pass
         if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, 
                                                                components = components, setup =  setup); break
-        elif option.lower().strip() in ('n', 'no'): print(texts[2]+eol); break
+        elif option.lower().strip() in ('n', 'no'): print(texts[2]+eol); break; exit(0)
