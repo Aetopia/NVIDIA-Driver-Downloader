@@ -177,7 +177,7 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
             f'{fg.lblue}Update?', 
             f"{fg.lred}The latest driver won't be downloaded.")     
     print(texts[0]) 
-
+    
     while True:
         try: option = input(f'{texts[1]} (Y/N) > '+eol); print()
         except KeyboardInterrupt: option = 'n'; print(); pass

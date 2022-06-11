@@ -4,10 +4,11 @@
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
+from traceback import print_exc
 from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from functions import *
 from textformat import *
-from os import getcwd, path
+from os import getcwd, path, startfile
 from sys import argv, exit; import sys
 from tempfile import gettempdir
 
@@ -90,7 +91,8 @@ def main():
 
     args = parser.parse_args()
     flags(args.flags)
-    if args.no_stdout: sys.stdout = None
+    if args.no_stdout:
+        sys.stdout = None
 
     if len(argv) != 1: 
         if not ('-dl' in argv or '--download' in argv \
@@ -144,7 +146,14 @@ def main():
                      components = args.components, setup = args.setup)  
     else: 
         parser.print_help()
-
+        
 if __name__ == '__main__':
+    stdout = sys.stdout
     try: main()
-    except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.'+eol);exit(1)       
+    except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.'+eol);exit(1)
+    except Exception as error: 
+        sys.stdout = stdout
+        print(f'{fg.lred}Error: {error}'+eol)
+        print_exc(file = open(f'{gettempdir()}/nvddl_error.log', 'w'))
+        startfile(f'{gettempdir()}/nvddl_error.log')    
+        exit(1)       
