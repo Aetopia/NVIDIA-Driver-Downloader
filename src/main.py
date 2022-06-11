@@ -146,12 +146,12 @@ def main():
                      components = args.components, setup = args.setup)  
     else: 
         parser.print_help()
-        
+
 if __name__ == '__main__':
     try: main()
     except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.'+eol);exit(1)
     except Exception as error: 
         print(f'{fg.lred}Error: {error}'+eol)
-        print_exc(file = open(f'{gettempdir()}/nvddl_error.log', 'w'))
-        startfile(f'{gettempdir()}/nvddl_error.log')    
+        print_exc(file = open(f'{gettempdir()}/nvddl_traceback.txt', 'w'))
+        startfile(f'{gettempdir()}/nvddl_traceback.log')    
         exit(1)       
