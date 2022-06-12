@@ -82,7 +82,6 @@ def get_archiver():
         return archiver        
     except UnboundLocalError: print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}"); exit(1)  
 
-
 def traceback_log() -> None:
     lines = []
     for line in format_exc().splitlines():
