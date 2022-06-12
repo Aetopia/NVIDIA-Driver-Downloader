@@ -1,3 +1,4 @@
+from tempfile import gettempdir
 from wmi import WMI 
 from xml.etree import ElementTree
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumValue
@@ -6,6 +7,8 @@ from subprocess import run
 from pathlib import Path
 from sys import exit
 from textformat import *
+from traceback import format_exc
+from os import path, startfile
 
 # Get PSID and PFID of the installed NVIDIA GPU.
 def get_psid_pfid() -> tuple:
@@ -77,4 +80,15 @@ def get_archiver():
                 if returncode == 0: break
             if returncode == 0: break
         return archiver        
-    except UnboundLocalError: print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}"); exit(1)                
+    except UnboundLocalError: print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}"); exit(1)  
+
+
+def traceback_log() -> None:
+    lines = []
+    for line in format_exc().splitlines():
+        if '  File' in line[0:6]:
+            line = line.split('",', 1); file = path.split(line[0].split("  File ")[1].lstrip('"'))[1]
+            line[0] = f'  File "{file}",'; line = ''.join(line)
+        lines += [line]
+    with open(f'{gettempdir()}/nvddl_traceback.txt', 'w') as f: f.write('\n'.join(lines))
+    startfile(f'{gettempdir()}/nvddl_traceback.txt', 'open')
