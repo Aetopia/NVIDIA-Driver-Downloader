@@ -100,7 +100,7 @@ def main():
            or '--extract' in argv or '-e' in argv \
            or '-ls' in argv or '--list' in argv):
            parser.print_usage() 
-           print(f'{fg.lred}Error: Options must be used with arguments.'+eol)
+           print(f'{fg.lred}Error: Options must be used with arguments.{eol}')
            exit()   
 
         if args.output is None: args.output = getcwd()
@@ -113,16 +113,16 @@ def main():
             case False: type = 'dch'; driver_type = f'DCH {driver_type}'   
 
         if args.list is True: 
-            print(f'{fg.lyellow}{driver_type} Drivers:'+eol)
+            print(f'{fg.lyellow}{driver_type} Drivers:{eol}')
             driver_versions = get_driver_versions(studio_drivers = args.studio, type = type)
 
             for index, driver_version in enumerate(driver_versions):
-                if index == 0: print(f' {fg.lgreen}~ {driver_version}'+eol) 
-                elif index+1 == len(driver_versions): print(f' {fg.lviolet}# {driver_version}'+eol)
-                else: print(f' {fg.lbeige}> {driver_version}'+eol)
+                if index == 0: print(f' {fg.lgreen}~ {driver_version}{eol}') 
+                elif index+1 == len(driver_versions): print(f' {fg.lviolet}# {driver_version}{eol}')
+                else: print(f' {fg.lbeige}> {driver_version}{eol}')
                 
         elif args.extract is not None:
-            print(f'{fg.lyellow}Extracting ({path.split(args.extract[0])[1].strip()})...'+eol)
+            print(f'{fg.lyellow}Extracting ({path.split(args.extract[0])[1].strip()})...{eol}')
             extract(args.extract[0], output = args.output, 
                     components = args.components, 
                     full = args.full, setup = args.setup)   
@@ -130,16 +130,16 @@ def main():
         elif args.update is True: update(studio_drivers = args.studio, components = args.components, setup = args.setup)  
 
         elif args.download is not None:
-            print(f'{fg.lyellow}Downloading {driver_type} Driver...'+eol)
+            print(f'{fg.lyellow}Downloading {driver_type} Driver...{eol}')
             driver_version = args.download
-            print(f'{fg.lyellow}Version: {driver_version}'+eol)
+            print(f'{fg.lyellow}Version: {driver_version}{eol}')
 
             download(driver_version = driver_version, studio_drivers = args.studio, 
                      type = type, output = args.output, 
                      full = args.full, components = args.components, setup = args.setup)
                      
         elif args.download is None:
-            print(f'{fg.lyellow}Downloading the Latest {driver_type} Driver...'+eol)
+            print(f'{fg.lyellow}Downloading the Latest {driver_type} Driver...{eol}')
             
             download(studio_drivers = args.studio, type = type, 
                      output = args.output, full = args.full, 
@@ -149,9 +149,9 @@ def main():
 
 if __name__ == '__main__':
     try: main()
-    except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.'+eol);exit(1)
+    except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.{eol}');exit(1)
     except Exception as error: 
-        print(f'{fg.lred}Error: {error}'+eol)
+        print(f'{fg.lred}Error: {error}{eol}')
         print_exc(file = open(f'{gettempdir()}/nvddl_traceback.txt', 'w'))
         startfile(f'{gettempdir()}/nvddl_traceback.txt', 'open')    
         exit(1)       

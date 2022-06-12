@@ -22,12 +22,12 @@ def flags(flags: list = []) -> None:
             match flag.lower():
 
                 case 'hwid-detect': 
-                    flags_verbose += f'{fg.lblue}Flag: Hardware ID Detection'+eol,
+                    flags_verbose += f'{fg.lblue}Flag: Hardware ID Detection{eol}',
                     global get_psid_pfid;from flags import get_psid_pfid     
 
-                case _: print(f'{fg.lred}Error: Invalid Flag > {flag}'+eol); exit(1) 
+                case _: print(f'{fg.lred}Error: Invalid Flag > {flag}{eol}'); exit(1) 
 
-        print(f'{fg.lred}Warning: Using Flags!'+eol)        
+        print(f'{fg.lred}Warning: Using Flags!{eol}')        
         for text in flags_verbose: print(text)
         print()
 
@@ -54,7 +54,7 @@ def get_driver_versions(studio_drivers = False, type = 'dch') -> tuple:
             if driver_version != '': driver_versions += driver_version,  
 
     if len(driver_versions) == 0:
-        print(f"{fg.lred}Error: Couldn't find any valid driver versions."+eol)
+        print(f"{fg.lred}Error: Couldn't find any valid driver versions.{eol}")
         exit(1)                  
     return driver_versions             
 
@@ -64,10 +64,10 @@ def download(driver_version = None, studio_drivers = False,
              full = False, components: list = [],
              setup = False) -> None:
     
-    if type == 'dch': type = 'DCH';print(f'{fg.lyellow}Type: DCH'+eol)
-    elif type == 'std': type = 'STD';print(f'{fg.lyellow}Type: Standard'+eol)
-    if full: print(f'{fg.lyellow}Package: Full'+eol)
-    elif full is False: print(f'{fg.lyellow}Package: Custom'+eol)
+    if type == 'dch': type = 'DCH';print(f'{fg.lyellow}Type: DCH{eol}')
+    elif type == 'std': type = 'STD';print(f'{fg.lyellow}Type: Standard{eol}')
+    if full: print(f'{fg.lyellow}Package: Full{eol}')
+    elif full is False: print(f'{fg.lyellow}Package: Custom{eol}')
     
     if path.exists(output) is False:
         makedirs(path.abspath(output))
@@ -92,33 +92,33 @@ def download(driver_version = None, studio_drivers = False,
 
     filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
 
-    print(f'{fg.lbeige}Checking Links...'+eol)
+    print(f'{fg.lbeige}Checking Links...{eol}')
     for index, driver_link in enumerate(driver_links):
         try:
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
-                print(f'{fg.lbeige}Queried version is valid, now downloading NVIDIA driver package...'+eol)
+                print(f'{fg.lbeige}Queried version is valid, now downloading NVIDIA driver package...{eol}')
 
                 if run(f'curl.exe -# "{driver_link}" -o "{filepath}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
                     if full is False: 
-                        print(f'{fg.lbeige}Trying to extract the downloaded driver package...'+eol)
+                        print(f'{fg.lbeige}Trying to extract the downloaded driver package...{eol}')
                         extract(f"{filepath}.exe", components = components, output = output, setup = setup)
 
                     elif full is True: 
                         file = f'{filepath}.exe'
                         if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(file)}"'
-                        print(f'{fg.lgreen}Downloaded to "{Path(filepath)}.exe"'+eol)
+                        print(f'{fg.lgreen}Downloaded to "{Path(filepath)}.exe"{eol}')
                         Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = filepath, creationflags = DETACHED_PROCESS)    
                     break  
 
         except HTTPError:
             if index == len(driver_links)-1:
-                print(f"{fg.lred}Error: Queried version isn't valid!"+eol)
+                print(f"{fg.lred}Error: Queried version isn't valid!{eol}")
                 exit(1)
 
 # Extract a driver package with the specified components.
 def extract(driver_file, output = gettempdir(), components: list = [], full = False, setup = False):
     if path.isfile(driver_file) is False:
-        print(f"{fg.lred}Error: Specified input is not a file."+eol)
+        print(f"{fg.lred}Error: Specified input is not a file.{eol}")
         exit(1) 
 
     # Initialize
@@ -127,7 +127,7 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
             match component.lower():
                 case 'audio': components[index] = 'HDAudio'
                 case 'physx': components[index] = 'PhysX'
-                case _: print(f'{fg.lred}Error: Invalid component(s) specified.'+eol); exit(1)
+                case _: print(f'{fg.lred}Error: Invalid component(s) specified.{eol}'); exit(1)
         components += BASE_COMPONENTS        
     else: components = []     
 
@@ -148,23 +148,23 @@ def extract(driver_file, output = gettempdir(), components: list = [], full = Fa
             with open(f'{output}/setup.cfg', 'w', encoding = 'UTF-8') as setup_cfg: 
                 setup_cfg.write('\n'.join(content))  
 
-        print(f'{fg.lgreen}Extracted to "{Path(path.abspath(output))}"'+eol)
+        print(f'{fg.lgreen}Extracted to "{Path(path.abspath(output))}"{eol}')
 
         if setup is False: file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
         Popen(file, shell=True, stdout = DEVNULL, stderr = STDOUT, cwd = output, creationflags = DETACHED_PROCESS)
 
-    else: print(f'{fg.lred}Error: Something went wrong while extracting the specified driver package.'+eol)   
+    else: print(f'{fg.lred}Error: Something went wrong while extracting the specified driver package.{eol}')   
 
 # Check if your NVIDIA driver is outdated or not.
 def update(studio_drivers = False, full = False, components: list = [], setup = False) -> None:
     
-    if studio_drivers: print(f'{fg.lyellow}Type: Studio'+eol)
-    else: print(f'{fg.lyellow}Type: Game Ready'+eol)
+    if studio_drivers: print(f'{fg.lyellow}Type: Studio{eol}')
+    else: print(f'{fg.lyellow}Type: Game Ready{eol}')
     latest_driver_versions = literal_eval(get_driver_versions(studio_drivers = studio_drivers)[0])
     installed_driver_version = get_installed_driver_version()
 
     if installed_driver_version == latest_driver_versions:
-        print(f'{fg.lgreen}The latest driver has been installed.'+eol); exit(0)
+        print(f'{fg.lgreen}The latest driver has been installed.{eol}'); exit(0)
 
     elif installed_driver_version > latest_driver_versions:
         texts = (
@@ -179,7 +179,7 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
     print(texts[0]) 
     
     while True:
-        try: option = input(f'{texts[1]} (Y/N) > '+eol); print()
+        try: option = input(f'{texts[1]} (Y/N) > {eol}'); print()
         except KeyboardInterrupt: option = 'n'; print(); pass
         if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, 
                                                                components = components, setup =  setup); break

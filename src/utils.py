@@ -21,7 +21,7 @@ def get_psid_pfid() -> tuple:
         else: IS_NOT_NVIDIA = True
 
     if IS_NOT_NVIDIA: 
-        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.\n'+eol)
+        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.\n{eol}')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
     
 # Parse the GPU List XML file into a dictionary.
@@ -40,7 +40,7 @@ def system_type() -> str:
     elif type in (3, 4, 5, 6, 7, 15, 16):
         return 'desktop'
     else:
-        print(f"{fg.lred}Error: Couldn't detect system type."+eol)
+        print(f"{fg.lred}Error: Couldn't detect system type.{eol}")
         exit(1)                         
 
 def get_drives():
@@ -52,14 +52,14 @@ def get_drives():
 def get_installed_driver_version() -> float:
     try: query_key = OpenKey(HKEY_LOCAL_MACHINE, 
                              r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
-    except FileNotFoundError: print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.'+eol); exit(1)    
+    except FileNotFoundError: print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.{eol}'); exit(1)    
     index = 0
     while True:
         try:
             key, value, _ = EnumValue(query_key, index)
             if key == 'DisplayVersion':
                 try: return float(value)
-                except ValueError: print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.'+eol); exit(1)
+                except ValueError: print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.{eol}'); exit(1)
         except OSError: break     
         index += 1
 
@@ -77,4 +77,4 @@ def get_archiver():
                 if returncode == 0: break
             if returncode == 0: break
         return archiver        
-    except UnboundLocalError: print(f"{fg.lred}Error: Couldn't find a usable archiving program."+eol); exit(1)                
+    except UnboundLocalError: print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}"); exit(1)                
