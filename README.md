@@ -39,6 +39,7 @@ pip install wmi
 
 # Build
 1. Install the following using `pip`:
+
     ```
     pip install nuitka zstandard
     ```
