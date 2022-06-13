@@ -98,7 +98,7 @@ def download(driver_version = None, studio_drivers = False,
             if urlopen(f'{driver_link}'.format(driver_version = driver_versions[0])).getcode() == 200:
                 print(f'{fg.lbeige}Queried version is valid, now downloading NVIDIA driver package...{eol}')
 
-                if run(f'curl.exe -# "{driver_link}" -o "{filepath}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
+                if run(f'curl.exe -#L "{driver_link}" -o "{filepath}.exe"'.format(driver_version = driver_versions[0])).returncode == 0:
                     if full is False: 
                         print(f'{fg.lbeige}Trying to extract the downloaded driver package...{eol}')
                         extract(f"{filepath}.exe", components = components, output = output, setup = setup)
