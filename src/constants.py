@@ -1,53 +1,53 @@
 from textformat import *
 # Download Links for Drivers (Static)
 STUDIO_DESKTOP_LINKS = {
-    'DCH':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-nsd-dch-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-nsd-dch-whql.exe'),
+    'DCH': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-nsd-dch-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-nsd-dch-whql.exe'),
 
-    'STD':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-nsd-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-nsd-whql.exe'),       
+    'STD': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-nsd-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-nsd-whql.exe'),
 }
 STUDIO_NOTEBOOK_LINKS = {
-    'DCH':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-nsd-dch-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-nsd-dch-whql.exe'),
+    'DCH': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-nsd-dch-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-nsd-dch-whql.exe'),
 
-    'STD':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-nsd-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-nsd-whql.exe'),       
+    'STD': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-nsd-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-nsd-whql.exe'),
 }
 
 GR_DESKTOP_LINKS = {
-    'DCH':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-dch-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-dch-whql.exe'),
+    'DCH': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-dch-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-dch-whql.exe'),
 
-    'STD':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-whql.exe')
+    'STD': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-win11-64bit-international-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-desktop-win10-64bit-international-whql.exe')
 }
 
 GR_NOTEBOOK_LINKS = {
-    'DCH':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-dch-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-dch-whql.exe'),
+    'DCH': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-dch-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-dch-whql.exe'),
 
-    'STD':('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-whql.exe',
-           'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-whql.exe')
+    'STD': ('https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-win11-64bit-international-whql.exe',
+            'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-whql.exe')
 }
 
 # API Link.
 API_LINK = 'https://www.nvidia.com/Download/processFind.aspx?psid={psid}&pfid={pfid}&osid=57&lid=1&whql={whql}&ctk=0&dtcid={dtcid}'
 
 # Base Driver Package Components.
-BASE_COMPONENTS = ['Display.Driver', 
-                   'NVI2', 
-                   'EULA.txt', 
-                   'ListDevices.txt', 
-                   'setup.cfg', 
+BASE_COMPONENTS = ['Display.Driver',
+                   'NVI2',
+                   'EULA.txt',
+                   'ListDevices.txt',
+                   'setup.cfg',
                    'setup.exe']
 
 # Setup
-SETUP = ('<file name="${{EulaHtmlFile}}"/>', 
-         '<file name="${{PrivacyPolicyFile}}"/>', 
+SETUP = ('<file name="${{EulaHtmlFile}}"/>',
+         '<file name="${{PrivacyPolicyFile}}"/>',
          '<file name="${{FunctionalConsentFile}}"/>')
 
-# Help 
+# Help
 HELP_ARGUMENTS = '''--list, -ls                        │ Show all available driver versions.
 --download, -dl <Driver Version>   │ Download the latest driver or a specified driver version.
 --extract, -e <Driver File>        │ Extract the specified driver package.
