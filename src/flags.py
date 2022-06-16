@@ -8,8 +8,9 @@ What has been added:
 """
 from wmi import WMI
 from urllib.request import urlopen
+from os import _exit
 from utils import gpus
-from textformat import *
+from textformat import fg, eol
 """
 NVIDIA Family -> '10DE'
 Device Type -> 'DISPLAY'
@@ -28,7 +29,7 @@ def get_psid_pfid() -> tuple:
         IS_NOT_NVIDIA = True
 
     if IS_NOT_NVIDIA:
-        print(f'{bg.lred}Warning: No NVIDIA GPU detected, using fallback mode.\n'+eol)
+        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.{eol}\n')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
 
 
@@ -56,8 +57,8 @@ def get_gpu():
         try:
             gpu = pciids()['10DE'][1][device]
         except KeyError:
-            print(f'{bg.lred}Error: No NVIDIA GPU Detected.'+eol)
-            exit(1)
+            print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}')
+            _exit(1)
 
         if dict == type(gpu):
             return tuple(gpu.values())[0]

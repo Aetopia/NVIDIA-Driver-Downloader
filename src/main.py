@@ -7,7 +7,7 @@ try:
     from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
     from functions import get_driver_versions, download, flags, extract, update
     from textformat import fg, eol
-    from os import getcwd, path
+    from os import getcwd, path, _exit
     from sys import argv, exit
     import sys
     from tempfile import gettempdir
@@ -162,11 +162,12 @@ try:
     if __name__ == '__main__':
         try:
             main()
-            exit(0)
+            _exit(0)
         except KeyboardInterrupt:
             print(f'\n{fg.lred}Warning: Operation Cancelled.{eol}')
-            exit(1)
-# Failsafe in case, NVDDL's initialization was not successful.
+            _exit(1)
+
+# Failsafe in case, NVDDL's initialization was not successful due to a keyboard interrupt.
 except KeyboardInterrupt:
-    from sys import exit
-    exit(1)
+    from os import _exit
+    _exit(1)
