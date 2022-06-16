@@ -153,5 +153,6 @@ if __name__ == '__main__':
         print(f'\n{fg.lred}Warning: Operation cancelled.{eol}');exit(1)
     except Exception as error: 
         from functions import traceback_log
+        from textformat import fg, eol
         print(f'{fg.lred}Error: {error}{eol}')
         traceback_log()
