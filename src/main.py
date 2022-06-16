@@ -166,6 +166,6 @@ try:
         except KeyboardInterrupt:
             print(f'\n{fg.lred}Warning: Operation Cancelled.{eol}')
             exit(1)
-# Failsafe in case, NVDDL initialization was not successful.
+# Failsafe in case, NVDDL's initialization was not successful.
 except KeyboardInterrupt:
     pass
