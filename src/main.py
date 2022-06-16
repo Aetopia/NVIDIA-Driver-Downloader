@@ -168,4 +168,5 @@ try:
             exit(1)
 # Failsafe in case, NVDDL's initialization was not successful.
 except KeyboardInterrupt:
-    pass
+    from sys import exit
+    exit(1)
