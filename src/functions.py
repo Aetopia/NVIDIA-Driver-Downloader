@@ -179,7 +179,8 @@ def update(studio_drivers = False, full = False, components: list = [], setup = 
     print(texts[0]) 
     
     while True:
-        option = input(f'{texts[1]} (Y/N) > {eol}'); print()
+        try: option = input(f'{texts[1]} (Y/N) > {eol}'); print()
+        except KeyboardInterrupt: pass; break
         if option.lower().strip() in ('y','yes', ''): download(full = full, studio_drivers = studio_drivers, 
                                                                components = components, setup =  setup); break
         elif option.lower().strip() in ('n', 'no'): print(texts[2]+eol); break; exit(0)
