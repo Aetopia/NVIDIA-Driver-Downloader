@@ -3,17 +3,16 @@
 # Discord: https://dsc.gg/CTT
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
-from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
-from traceback import print_exc
-from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
-from functions import *
-from textformat import *
-from os import getcwd, path, startfile
-from sys import argv, exit; import sys
-from tempfile import gettempdir
-
-
 def main():
+    # Modules
+    from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
+    from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
+    from functions import get_driver_versions, download, flags, extract, update 
+    from textformat import fg, eol
+    from os import getcwd, path
+    from sys import argv, exit;import sys
+    from tempfile import gettempdir
+
     parser = ArgumentParser(description = PROGRAM_DESCRIPTION, 
     formatter_class = RawDescriptionHelpFormatter,
     add_help=False, usage=SUPPRESS)
@@ -149,7 +148,10 @@ def main():
 
 if __name__ == '__main__':
     try: main()
-    except KeyboardInterrupt: print(f'\n{fg.lred}Warning: Operation cancelled.{eol}');exit(1)
+    except KeyboardInterrupt: 
+        from textformat import fg, eol
+        print(f'\n{fg.lred}Warning: Operation cancelled.{eol}');exit(1)
     except Exception as error: 
+        from functions import traceback_log
         print(f'{fg.lred}Error: {error}{eol}')
         traceback_log()
