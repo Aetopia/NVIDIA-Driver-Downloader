@@ -2,7 +2,7 @@
 from re import T
 from shutil import rmtree
 from constants import STUDIO_DESKTOP_LINKS, STUDIO_NOTEBOOK_LINKS, GR_DESKTOP_LINKS, GR_NOTEBOOK_LINKS, API_LINK, BASE_COMPONENTS, SETUP  # constants.py
-from os import makedirs, path, _exit
+from os import makedirs, path
 from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
 from urllib.request import urlopen
@@ -13,6 +13,7 @@ from subprocess import run
 from utils import get_archiver, get_installed_driver_version, system_type, get_psid_pfid
 from ast import literal_eval
 from textformat import *
+from sys import exit
 
 # Flags -> Enables or replaces certain functions.
 
@@ -30,7 +31,7 @@ def flags(flags: list = []) -> None:
 
                 case _:
                     print(f'{fg.lred}Error: Invalid Flag > {flag}{eol}')
-                    _exit(1)
+                    exit(1)
 
         print(f'{fg.lred}Warning: Using Flags!{eol}')
         for text in flags_verbose:
@@ -68,7 +69,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
 
     if len(driver_versions) == 0:
         print(f"{fg.lred}Error: Couldn't find any valid driver versions.{eol}")
-        _exit(1)
+        exit(1)
     return driver_versions
 
 # Download an NVIDIA Driver Package.
@@ -141,7 +142,7 @@ def download(driver_version=None, studio_drivers=False,
         except HTTPError:
             if index == len(driver_links)-1:
                 print(f"{fg.lred}Error: Queried version isn't valid!{eol}")
-                _exit(1)
+                exit(1)
 
 # Extract a driver package with the specified components.
 
@@ -149,7 +150,7 @@ def download(driver_version=None, studio_drivers=False,
 def extract(driver_file, output=gettempdir(), components: list = [], full=False, setup=False):
     if path.isfile(driver_file) is False:
         print(f"{fg.lred}Error: Specified input is not a file.{eol}")
-        _exit(1)
+        exit(1)
 
     # Initialize
     if full is False:
@@ -159,7 +160,7 @@ def extract(driver_file, output=gettempdir(), components: list = [], full=False,
                 case 'physx': components[index] = 'PhysX'
                 case _:
                     print(f'{fg.lred}Error: Invalid component(s) specified.{eol}')
-                    _exit(1)
+                    exit(1)
         components += BASE_COMPONENTS
     else:
         components = []
@@ -210,7 +211,7 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
 
     if installed_driver_version == latest_driver_versions:
         print(f'{fg.lgreen}The latest driver has been installed.{eol}')
-        _exit(0)
+        exit(0)
 
     elif installed_driver_version > latest_driver_versions:
         texts = (

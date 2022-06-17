@@ -51,7 +51,7 @@ def system_type() -> str:
         return 'desktop'
     else:
         print(f"{fg.lred}Error: Couldn't detect system type.{eol}")
-        _exit(1)
+        exit(1)
 
 
 def get_drives():
@@ -67,7 +67,7 @@ def get_installed_driver_version() -> float:
                             r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
     except FileNotFoundError:
         print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.{eol}')
-        _exit(1)
+        exit(1)
     index = 0
     while True:
         try:
@@ -78,7 +78,7 @@ def get_installed_driver_version() -> float:
                 except ValueError:
                     print(
                         f'{fg.lred}Error: NVIDIA Display Driver is not installed.{eol}')
-                    _exit(1)
+                    exit(1)
         except OSError:
             break
         index += 1
@@ -105,4 +105,4 @@ def get_archiver():
         return archiver
     except UnboundLocalError:
         print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}")
-        _exit(1)
+        exit(1)

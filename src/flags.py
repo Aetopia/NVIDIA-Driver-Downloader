@@ -58,7 +58,7 @@ def get_gpu():
             gpu = pciids()['10DE'][1][device]
         except KeyError:
             print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}')
-            _exit(1)
+            exit(1)
 
         if dict == type(gpu):
             return tuple(gpu.values())[0]
