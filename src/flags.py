@@ -8,7 +8,6 @@ What has been added:
 """
 from wmi import WMI
 from urllib.request import urlopen
-from os import _exit
 from utils import gpus
 from textformat import fg, eol
 """

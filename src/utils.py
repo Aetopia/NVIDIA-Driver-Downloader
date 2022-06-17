@@ -6,7 +6,6 @@ from urllib.request import urlopen
 from subprocess import run
 from pathlib import Path
 from textformat import *
-from os import _exit
 
 # Get PSID and PFID of the installed NVIDIA GPU.
 
@@ -25,7 +24,7 @@ def get_psid_pfid() -> tuple:
             IS_NOT_NVIDIA = True
 
     if IS_NOT_NVIDIA:
-        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.\n{eol}')
+        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.{eol}\n')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
 
 # Parse the GPU List XML file into a dictionary.
