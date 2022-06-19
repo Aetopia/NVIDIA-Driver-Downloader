@@ -41,7 +41,7 @@ pip install wmi
 1. Install the following using `pip`:
 
     ```
-    pip install nuitka zstandard
+    pip install nuitka zstandard ordered-set
     ```
 2. Go into the `src` folder and run `build.bat`.
 
