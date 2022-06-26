@@ -6,11 +6,17 @@
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
 from constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from functions import get_driver_versions, download, flags, extract, update
+from traceback import format_exc
 from textformat import fg, eol
 from os import getcwd, path, _exit
 from sys import argv, exit
 import sys
 from tempfile import gettempdir
+from logging import basicConfig, info, error, warning
+
+basicConfig(filename='nvddl.log', filemode='w+',
+            format='%(levelname)s: %(message)s', level='INFO')
+
 
 def main():
     parser = ArgumentParser(description=PROGRAM_DESCRIPTION,
@@ -20,32 +26,32 @@ def main():
     parser.add_argument('--help', action='help', help=SUPPRESS)
 
     arguments = parser.add_argument_group(title=' Arguments',
-                                            description=HELP_ARGUMENTS)\
+                                          description=HELP_ARGUMENTS)\
         .add_mutually_exclusive_group()
 
     driver_options = parser.add_argument_group(title=' Driver Options',
-                                                description=HELP_DRIVER_OPTIONS)
+                                               description=HELP_DRIVER_OPTIONS)
 
     options = parser.add_argument_group(title=' Options',
                                         description=HELP_OPTIONS)
 
     arguments.add_argument('--list', '-ls',
-                            action='store_true',
-                            help=SUPPRESS)
+                           action='store_true',
+                           help=SUPPRESS)
 
     arguments.add_argument('--download', '-dl',
-                            nargs='?',
-                            help=SUPPRESS,
-                            metavar='Driver Version')
+                           nargs='?',
+                           help=SUPPRESS,
+                           metavar='Driver Version')
 
     arguments.add_argument('--extract', '-e',
-                            nargs=1,
-                            help=SUPPRESS,
-                            metavar='<Driver File>')
+                           nargs=1,
+                           help=SUPPRESS,
+                           metavar='<Driver File>')
 
     arguments.add_argument('--update', '-u',
-                            action='store_true',
-                            help=SUPPRESS)
+                           action='store_true',
+                           help=SUPPRESS)
 
     driver_options.add_argument('--studio', '-stu',
                                 action='store_true',
@@ -64,31 +70,34 @@ def main():
                                 help=SUPPRESS)
 
     options.add_argument('--components', '-c',
-                            action='store',
-                            metavar=('Component', 'Components'),
-                            default=[],
-                            nargs='+',
-                            help=SUPPRESS)
+                         action='store',
+                         metavar=('Component', 'Components'),
+                         default=[],
+                         nargs='+',
+                         help=SUPPRESS)
 
     options.add_argument('--output', '-o',
-                            nargs='?',
-                            default=gettempdir(),
-                            action='store',
-                            help=SUPPRESS,
-                            metavar='Directory')
+                         nargs='?',
+                         default=gettempdir(),
+                         action='store',
+                         help=SUPPRESS,
+                         metavar='Directory')
 
     options.add_argument('--flags',
-                            action='store',
-                            metavar=('Flag', 'Flags'),
-                            nargs='+',
-                            default=[],
-                            help=SUPPRESS)
+                         action='store',
+                         metavar=('Flag', 'Flags'),
+                         nargs='+',
+                         default=[],
+                         help=SUPPRESS)
 
     parser.add_argument('--no-stdout',
                         action='store_true',
                         help=SUPPRESS)
-
     args = parser.parse_args()
+
+    info(f'Namespace: {args}')
+    info(f'Arguments: {argv}')
+
     flags(args.flags)
     if args.no_stdout:
         sys.stdout = None
@@ -100,6 +109,7 @@ def main():
                 or '-ls' in argv or '--list' in argv):
             parser.print_usage()
             print(f'{fg.lred}Error: Options must be used with arguments.{eol}')
+            error('Options must be used with arguments.')
             exit()
 
         if args.output is None:
@@ -117,6 +127,7 @@ def main():
                 driver_type = f'DCH {driver_type}'
 
         if args.list is True:
+            info('Getting Driver Versions...')
             print(f'{fg.lyellow}{driver_type} Drivers:{eol}')
             driver_versions = get_driver_versions(
                 studio_drivers=args.studio, type=type)
@@ -130,6 +141,7 @@ def main():
                     print(f' {fg.lbeige}> {driver_version}{eol}')
 
         elif args.extract is not None:
+            info('Extracting Driver...')
             print(
                 f'{fg.lyellow}Extracting ({path.split(args.extract[0])[1].strip()})...{eol}')
             extract(args.extract[0], output=args.output,
@@ -137,32 +149,47 @@ def main():
                     full=args.full, setup=args.setup)
 
         elif args.update is True:
+            info('Updating Driver...')
             update(studio_drivers=args.studio,
-                    components=args.components, setup=args.setup)
+                   components=args.components, setup=args.setup)
 
         elif args.download is not None:
+            info('Downloading Driver...')
             print(f'{fg.lyellow}Downloading {driver_type} Driver...{eol}')
             driver_version = args.download
             print(f'{fg.lyellow}Version: {driver_version}{eol}')
 
             download(driver_version=driver_version, studio_drivers=args.studio,
-                        type=type, output=args.output,
-                        full=args.full, components=args.components, setup=args.setup)
+                     type=type, output=args.output,
+                     full=args.full, components=args.components, setup=args.setup)
 
         elif args.download is None:
+            info('Downloading Driver...')
             print(
                 f'{fg.lyellow}Downloading the Latest {driver_type} Driver...{eol}')
 
             download(studio_drivers=args.studio, type=type,
-                        output=args.output, full=args.full,
-                        components=args.components, setup=args.setup)
+                     output=args.output, full=args.full,
+                     components=args.components, setup=args.setup)
     else:
         parser.print_help()
+
 
 if __name__ == '__main__':
     try:
         main()
+        info('Finished!')
         exit(0)
     except KeyboardInterrupt:
         print(f'\n{fg.lred}Warning: Operation Cancelled.{eol}')
+        warning('Operation Cancelled.')
+        _exit(1)
+    except Exception as e:
+        print(
+            f'''\n{fg.lred}Error: Found an uncatchable exception!\n> {e}{eol}''')
+        error('Found an uncatchable exception!')
+        error(f'Exception: {e}')
+        with open('nvddl_traceback.txt', 'w') as f:
+            f.write(format_exc())
+        info('Exiting...')
         _exit(1)

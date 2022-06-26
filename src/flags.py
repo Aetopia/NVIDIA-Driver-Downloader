@@ -10,25 +10,29 @@ from wmi import WMI
 from urllib.request import urlopen
 from utils import gpus
 from textformat import fg, eol
+from logging import basicConfig, error, info, warning
 """
 NVIDIA Family -> '10DE'
 Device Type -> 'DISPLAY'
 """
 
+basicConfig(filename='nvddl.log', filemode='w+',
+            format='%(levelname)s: %(message)s', level='INFO')
 
 def get_psid_pfid() -> tuple:
     gpu_list = gpus()
-    IS_NOT_NVIDIA = False
+    isNVIDIA = True
     detected_gpu = get_gpu()
 
     for gpu in gpu_list.keys():
         if gpu in detected_gpu:
             return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
     else:
-        IS_NOT_NVIDIA = True
+        isNVIDIA = False
 
-    if IS_NOT_NVIDIA:
+    if isNVIDIA is False:
         print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.{eol}\n')
+        warning('No NVIDIA GPU detected, using fallback mode.')
         return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
 
 
@@ -57,11 +61,14 @@ def get_gpu():
             gpu = pciids()['10DE'][1][device]
         except KeyError:
             print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}')
+            error('No NVIDIA GPU Detected.')
             exit(1)
 
         if dict == type(gpu):
+            info(f'Detected: {tuple(gpu.values())[0]}')
             return tuple(gpu.values())[0]
         else:
+            info(f'Detected: {gpu}')
             return gpu
 
 
