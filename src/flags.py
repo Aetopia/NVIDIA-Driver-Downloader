@@ -11,12 +11,13 @@ from urllib.request import urlopen
 from utils import gpus
 from textformat import fg, eol
 from logging import basicConfig, error, info, warning
+from tempfile import gettempdir
 """
 NVIDIA Family -> '10DE'
 Device Type -> 'DISPLAY'
 """
 
-basicConfig(filename='nvddl.log', filemode='w+',
+basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 def get_psid_pfid() -> tuple:

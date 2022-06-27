@@ -6,8 +6,9 @@ from subprocess import run
 from pathlib import Path
 from textformat import *
 from logging import basicConfig, info, error
+from tempfile import gettempdir
 
-basicConfig(filename='nvddl.log', filemode='w+',
+basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 # Get PSID and PFID of the installed NVIDIA GPU.
