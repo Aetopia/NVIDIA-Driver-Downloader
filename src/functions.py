@@ -15,7 +15,7 @@ from textformat import fg, eol
 from logging import basicConfig, info, error, warning
 from sys import exit
 
-basicConfig(filename='nvddl.log', filemode='w+',
+basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 # Flags -> Enables or replaces certain functions.

@@ -14,7 +14,7 @@ import sys
 from tempfile import gettempdir
 from logging import basicConfig, info, error, warning
 
-basicConfig(filename='nvddl.log', filemode='w+',
+basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
             f'''\n{fg.lred}Error: Found an uncatchable exception!\n> {e}{eol}''')
         error('Found an uncatchable exception!')
         error(f'Exception: {e}')
-        with open('nvddl_traceback.txt', 'w') as f:
+        with open(f'{gettempdir()}/nvddl_traceback.txt', 'w') as f:
             f.write(format_exc())
         info('Exiting...')
         _exit(1)
