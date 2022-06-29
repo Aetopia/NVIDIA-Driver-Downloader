@@ -50,8 +50,8 @@ def system_type() -> str:
     type = [system.wmi_property('ChassisTypes').value[0]
             for system in WMI().Win32_SystemEnclosure()][0]
     if type in (8, 9, 10, 11, 12, 14, 18, 21):
-        info('System Type: Laptop.')
-        return 'laptop'
+        info('System Type: Notebook.')
+        return 'notebook'
     elif type in (3, 4, 5, 6, 7, 15, 16):
         info('System Type: Desktop')
         return 'desktop'

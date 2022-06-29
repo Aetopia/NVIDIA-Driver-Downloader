@@ -116,7 +116,7 @@ def download(driver_version=None, studio_drivers=False,
         case True:
             prefix = 'Studio'
             match system_type():
-                case 'laptop':
+                case 'notebook':
                     driver_links = STUDIO_NOTEBOOK_LINKS[type]
                     info('Links Category: Studio Notebook')
 
@@ -127,7 +127,7 @@ def download(driver_version=None, studio_drivers=False,
         case False:
             prefix = 'Game Ready'
             match system_type():
-                case 'laptop':
+                case 'notebook':
                     driver_links = GR_NOTEBOOK_LINKS[type]
                     info('Links Category: Game Ready Notebook')
 
