@@ -10,8 +10,9 @@ from wmi import WMI
 from urllib.request import urlopen
 from utils import gpus
 from textformat import fg, eol
-from logging import basicConfig, error, info, warning
+from logging import basicConfig, error, info
 from tempfile import gettempdir
+from sys import exit
 """
 NVIDIA Family -> '10DE'
 Device Type -> 'DISPLAY'
@@ -19,6 +20,7 @@ Device Type -> 'DISPLAY'
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
+
 
 def get_psid_pfid() -> tuple:
     gpu_list = gpus()
@@ -30,6 +32,8 @@ def get_psid_pfid() -> tuple:
 
 
 def get_gpu():
+    def message(): print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}'); error(
+        'No NVIDIA GPU Detected.'); exit(1)
     """
     Get the GPU name using a Hardware ID.
     """
@@ -48,14 +52,14 @@ def get_gpu():
             pass
         except IndexError:
             pass
-        
+
+    if devices == ():
+        message()
     for device in devices:
         try:
             gpu = pciids()['10DE'][1][device]
         except KeyError:
-            print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}')
-            error('No NVIDIA GPU Detected.')
-            exit(1)
+            message()
 
         if dict == type(gpu):
             info(f'Detected: {tuple(gpu.values())[0]}')
