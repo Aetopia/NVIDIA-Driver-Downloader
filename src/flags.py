@@ -22,19 +22,11 @@ basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
 
 def get_psid_pfid() -> tuple:
     gpu_list = gpus()
-    isNVIDIA = True
     detected_gpu = get_gpu()
 
     for gpu in gpu_list.keys():
         if gpu in detected_gpu:
             return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
-    else:
-        isNVIDIA = False
-
-    if isNVIDIA is False:
-        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.{eol}\n')
-        warning('No NVIDIA GPU detected, using fallback mode.')
-        return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
 
 
 def get_gpu():
@@ -56,7 +48,7 @@ def get_gpu():
             pass
         except IndexError:
             pass
-
+        
     for device in devices:
         try:
             gpu = pciids()['10DE'][1][device]
