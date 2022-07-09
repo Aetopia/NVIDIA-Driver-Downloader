@@ -49,3 +49,4 @@ pip install wmi
 ### 1. NVIDIA's Advanced Driver Search & Driver Package Extraction: [NVIDIA-Update](https://github.com/lord-carlos/nvidia-update)
 ### 2. NVIDIA API: [EnvyUpdate](https://github.com/fyr77/EnvyUpdate/wiki/Nvidia-API)
 ### 3. Hardware IDs: [PCIUTILS/PCIIDS](https://github.com/pciutils/pciids)
+### 4. NVIDIA Debloating Guide: [EVA](https://github.com/amitxv/EVA)
