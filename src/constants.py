@@ -31,6 +31,10 @@ GR_NOTEBOOK_LINKS = {
             'https://international.download.nvidia.com/Windows/{driver_version}/{driver_version}-notebook-win10-64bit-international-whql.exe')
 }
 
+QUADRO_LINKS = (
+    'https://international.download.nvidia.com/Windows/Quadro_Certified/{driver_version}/{driver_version}-quadro-rtx-desktop-notebook-win10-win11-64bit-international-dch-whql.exe')
+
+
 # API Link.
 API_LINK = 'https://www.nvidia.com/Download/processFind.aspx?psid={psid}&pfid={pfid}&osid=57&lid=1&whql={whql}&ctk=0&dtcid={dtcid}'
 
@@ -46,6 +50,9 @@ BASE_COMPONENTS = ['Display.Driver',
 SETUP = ('<file name="${{EulaHtmlFile}}"/>',
          '<file name="${{PrivacyPolicyFile}}"/>',
          '<file name="${{FunctionalConsentFile}}"/>')
+
+PRESENTATIONS = ('\t\t<string name="ProgressPresentationUrl"',
+                 '\t\t<string name="ProgressPresentationSelectedPackageUrl"')
 
 # Help
 HELP_ARGUMENTS = '''--list, -ls                        │ Show all available driver versions.

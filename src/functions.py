@@ -1,6 +1,6 @@
 # Modules
 from shutil import rmtree
-from constants import STUDIO_DESKTOP_LINKS, STUDIO_NOTEBOOK_LINKS, GR_DESKTOP_LINKS, GR_NOTEBOOK_LINKS, API_LINK, BASE_COMPONENTS, SETUP  # constants.py
+from constants import STUDIO_DESKTOP_LINKS, STUDIO_NOTEBOOK_LINKS, GR_DESKTOP_LINKS, GR_NOTEBOOK_LINKS, API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
 from os import makedirs, path
 from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
@@ -28,13 +28,6 @@ def flags(flags: list = []) -> None:
         flags_verbose = ()
         for flag in flags:
             match flag.lower():
-
-                case 'hwid-detect':
-                    flags_verbose += f'{fg.lblue}Flag: Hardware ID Detection{eol}',
-                    info('Flag: Hardware ID Detection')
-                    global get_psid_pfid
-                    from flags import get_psid_pfid
-
                 case _:
                     print(f'{fg.lred}Error: Invalid Flag > {flag}{eol}')
                     error(f'Invalid Flag > {flag}')
@@ -210,15 +203,24 @@ def extract(driver_file, output=gettempdir(), components: list = [], full=False,
     if run(archiver_cmd).returncode == 0:
 
         if full is False:
-            with open(f'{output}/setup.cfg', 'r+', encoding='UTF-8') as setup_cfg:
-                content = setup_cfg.read().splitlines()
-                setup_cfg.seek(0)
-                for line in setup_cfg.read().splitlines():
+            with open(f'{output}/setup.cfg', 'r+', encoding='UTF-8') as cfg:
+                content = cfg.read().splitlines(); cfg.seek(0)
+                for line in cfg.read().splitlines():
                     if line.strip() in SETUP:
                         content.pop(content.index(line))
+            with open(f'{output}/setup.cfg', 'w', encoding='UTF-8') as cfg:
+                cfg.write('\n'.join(content))
 
-            with open(f'{output}/setup.cfg', 'w', encoding='UTF-8') as setup_cfg:
-                setup_cfg.write('\n'.join(content))
+            with open(f'{output}/NVI2/presentations.cfg', 'r+', encoding='UTF-8') as cfg:
+                cfg = cfg.read().splitlines()
+                content = cfg
+                for index, line in enumerate(cfg):
+                    if fnmatch(line, f'{PRESENTATIONS[0]}*'):
+                        content[index] = f'{PRESENTATIONS[0]} value=""/>'
+                    elif fnmatch(line, f'{PRESENTATIONS[1]}*'):
+                        content[index] = f'{PRESENTATIONS[1]} value=""/>'
+            with open(f'{output}/NVI2/presentations.cfg', 'w', encoding='UTF-8') as cfg:
+                cfg.write('\n'.join(content))
 
         print(f'{fg.lgreen}Extracted to "{Path(path.abspath(output))}"{eol}')
         info(f'Extracted to "{Path(path.abspath(output))}"')

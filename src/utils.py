@@ -1,11 +1,10 @@
 from wmi import WMI
-from xml.etree import ElementTree
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumValue
-from urllib.request import urlopen
 from subprocess import run
 from pathlib import Path
-from textformat import *
+from textformat import fg, eol
 from logging import basicConfig, info, error
+from helpers import *
 from tempfile import gettempdir
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
@@ -16,33 +15,49 @@ basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
 
 def get_psid_pfid() -> tuple:
     gpu_list = gpus()
-    isNVIDIA = True
+    detected_gpu = get_gpu()
 
-    for detected_gpus in WMI().Win32_VideoController():
-        detected_gpu = detected_gpus.Caption
-        if 'nvidia' in detected_gpu.lower():
-            for gpu in gpu_list.keys():
-                if gpu in detected_gpu:
-                    info(f'Detected: {gpu}')
-                    return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
+    for gpu in gpu_list.keys():
+        if gpu in detected_gpu:
+            return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
+
+
+def get_gpu():
+    def message(): print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}'); error(
+        'No NVIDIA GPU Detected.'); exit(1)
+    """
+    Get the GPU name using a Hardware ID.
+    """
+    vendor_filter = '10DE'
+    devices = ()
+
+    for driver in WMI().Win32_PnPSignedDriver():
+        try:
+            hwid = driver.HardwareID.split(
+                'PCI\\')[1].split('VEN_')[1].split('&')
+            vendor, device = hwid[0], hwid[1].split('DEV_')[1]
+            # 3D Video Controller is the driver installed when no suitable driver is found or installed for the given GPU.
+            if vendor == vendor_filter and (driver.DeviceClass == 'DISPLAY' or driver.DeviceName == '3D Video Controller'):
+                devices += device,
+        except AttributeError:
+            pass
+        except IndexError:
+            pass
+
+    if devices == ():
+        message()
+    for device in devices:
+        try:
+            gpu = pciids()['10DE'][1][device]
+        except KeyError:
+            message()
+
+        if dict == type(gpu):
+            info(f'Detected: {tuple(gpu.values())[0]}')
+            return tuple(gpu.values())[0]
         else:
-            isNVIDIA = False
-
-    if isNVIDIA is False:
-        print(f'{fg.lred}Warning: No NVIDIA GPU detected, using fallback mode.{eol}\n')
-        info('No NVIDIA GPU detected, using fallback mode.')
-        return gpu_list['GeForce GTX 1050']['PSID'], gpu_list['GeForce GTX 1050']['PFID']
-
-# Parse the GPU List XML file into a dictionary.
-
-
-def gpus() -> dict:
-    response = {}
-    xml = ElementTree.parse(urlopen(
-        'https://www.nvidia.com/Download/API/lookupValueSearch.aspx?TypeID=3')).getroot()
-    for index, tag in enumerate(xml.findall('LookupValues/LookupValue')):
-        response[tag[0].text] = {'PSID': str(index), 'PFID': tag[1].text}
-    return response
+            info(f'Detected: {gpu}')
+            return gpu
 
 # Detect if the device being used is a laptop or desktop. (Thanks Felipe#5555! :3)
 
@@ -113,7 +128,7 @@ def get_archiver():
                     break
             if returncode == 0:
                 break
-        info(f'Usable Archiver Found: "{archiver}"')    
+        info(f'Usable Archiver Found: "{archiver}"')
         return f'"{archiver}"'
     except UnboundLocalError:
         print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}")
