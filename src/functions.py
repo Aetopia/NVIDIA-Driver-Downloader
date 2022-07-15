@@ -1,6 +1,7 @@
 # Modules
 from shutil import rmtree
-from constants import QUADRO_LINKS, STUDIO_DESKTOP_LINKS, STUDIO_NOTEBOOK_LINKS, GR_DESKTOP_LINKS, GR_NOTEBOOK_LINKS, API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
+from constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
+from links import *
 from os import makedirs, path
 from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
@@ -140,11 +141,13 @@ def download(driver_version=None, studio_drivers=False,
     for index, driver_link in enumerate(driver_links):
         try:
             if urlopen(f'{driver_link}'.format(driver_version=driver_versions[0])).getcode() == 200:
+                
                 info(f'Queried version is valid: {driver_versions[0]}')
                 info(f'Valid Link: {driver_link}'.format(
                     driver_version=driver_versions[0]))
                 print(
                     f'{fg.lbeige}Queried version is valid, now downloading NVIDIA driver package...{eol}')
+
                 curl_cmd = f'curl.exe -#L "{driver_link}" -o "{filepath}.exe"'.format(
                     driver_version=driver_versions[0])
                 info(f'Curl Command: {curl_cmd}')
