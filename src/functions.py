@@ -1,6 +1,6 @@
 # Modules
 from shutil import rmtree
-from constants import STUDIO_DESKTOP_LINKS, STUDIO_NOTEBOOK_LINKS, GR_DESKTOP_LINKS, GR_NOTEBOOK_LINKS, API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
+from constants import QUADRO_LINKS, STUDIO_DESKTOP_LINKS, STUDIO_NOTEBOOK_LINKS, GR_DESKTOP_LINKS, GR_NOTEBOOK_LINKS, API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
 from os import makedirs, path
 from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
@@ -127,6 +127,13 @@ def download(driver_version=None, studio_drivers=False,
                 case 'desktop':
                     driver_links = GR_DESKTOP_LINKS[type]
                     info('Links Category: Game Ready Desktop')
+    
+    # Quadro Card Detection.
+    try:
+        float(driver_versions[0])
+    except ValueError:
+        driver_versions = driver_versions[0].split('(')[1].strip(')').strip(),
+        driver_links = QUADRO_LINKS
 
     filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
     print(f'{fg.lbeige}Checking Links...{eol}')

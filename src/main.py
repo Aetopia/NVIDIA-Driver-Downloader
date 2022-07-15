@@ -184,9 +184,11 @@ if __name__ == '__main__':
         print(f'\n{fg.lred}Warning: Operation Cancelled.{eol}')
         warning('Operation Cancelled.')
         _exit(1)
+
     except Exception as e:
         print(
-            f'''\n{fg.lred}Error: Found an uncatchable exception!\n> {e}{eol}''')
+            f'\n{fg.lred}Error: Found an uncatchable exception!\n> {e}\n')
+        print(f'Check out the log and traceback files for more details.\nLog: "%TEMP%\\nvddl.log"\nTraceback: "%TEMP%\\nvddl_traceback.txt"{eol}')
         error('Found an uncatchable exception!')
         error(f'Exception: {e}')
         with open(f'{gettempdir()}/nvddl_traceback.txt', 'w') as f:
