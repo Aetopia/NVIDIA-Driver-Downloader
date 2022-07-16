@@ -19,6 +19,11 @@
 10. `--setup` | Run the extracted driver package setup.
 11. `--flags [Flags ...]` | Pass flags to NVDDL.
 
+# Alternatives
+Alternatives to NVDDL!
+
+1. Zusier's NVIX: https://github.com/Zusier/NVIX
+
 # Wiki
 ### Check out NVDDL's Documentation/Wiki: [Documentation/Wiki](https://github.com/Aetopia/NVIDIA-Driver-Downloader/wiki)
 
