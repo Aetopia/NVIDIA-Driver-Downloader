@@ -22,7 +22,7 @@ def get_psid_pfid() -> tuple:
             return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
 
 
-def get_gpu():
+def get_gpu(log=True):
     def message(): print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}'); error(
         'No NVIDIA GPU Detected.'); exit(1)
     """
@@ -53,10 +53,12 @@ def get_gpu():
             message()
 
         if dict == type(gpu):
-            info(f'Detected: {tuple(gpu.values())[0]}')
+            if log:
+                info(f'Detected: {tuple(gpu.values())[0]}')
             return tuple(gpu.values())[0]
         else:
-            info(f'Detected: {gpu}')
+            if log:
+                info(f'Detected: {gpu}')
             return gpu
 
 # Detect if the device being used is a laptop or desktop. (Thanks Felipe#5555! :3)
@@ -66,10 +68,8 @@ def system_type() -> str:
     type = [system.wmi_property('ChassisTypes').value[0]
             for system in WMI().Win32_SystemEnclosure()][0]
     if type in (8, 9, 10, 11, 12, 14, 18, 21):
-        info('System Type: Notebook.')
         return 'notebook'
     elif type in (3, 4, 5, 6, 7, 15, 16):
-        info('System Type: Desktop')
         return 'desktop'
     else:
         print(f"{fg.lred}Error: Couldn't detect system type.{eol}")
@@ -134,3 +134,32 @@ def get_archiver():
         print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}")
         error('Couldn\'t find a usable archiving program.')
         exit(1)
+
+
+def dl_links(version, studio=False, type='dch'):
+    links = []
+    channel = ''
+    BASE_LINK = 'https://international.download.nvidia.com/Windows'
+    try:
+        float(version)
+    except ValueError:
+        version = version.split('(')[1].strip(')').strip()
+
+    system = system_type()
+
+    match studio:
+        case True: nsd = '-nsd'
+        case False: nsd = ''
+
+    match type:
+        case 'dch': type = '-dch'
+        case 'std': type = ''
+
+    if 'quadro' in str(get_gpu(log=False)).lower():
+        channel = 'Quadro_Certified/'
+        system = 'quadro-rtx-desktop-notebook'
+
+    for winver in ('win10-win11', 'win10'):
+        links.append(
+            f'{BASE_LINK}/{channel}{version}/{version}-{system}-{winver}-64bit-international{nsd}{type}-whql.exe')
+    return links

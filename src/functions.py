@@ -1,7 +1,6 @@
 # Modules
 from shutil import rmtree
 from constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
-from links import *
 from os import makedirs, path
 from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
@@ -10,7 +9,7 @@ from urllib.error import HTTPError
 from pathlib import Path
 from fnmatch import fnmatch
 from subprocess import run
-from utils import get_archiver, get_installed_driver_version, system_type, get_psid_pfid
+from utils import dl_links, get_archiver, get_installed_driver_version, system_type, get_psid_pfid
 from ast import literal_eval
 from textformat import fg, eol
 from logging import basicConfig, info, error, warning
@@ -87,11 +86,10 @@ def download(driver_version=None, studio_drivers=False,
              setup=False) -> None:
 
     if type == 'dch':
-        type = 'DCH'
         print(f'{fg.lyellow}Type: DCH{eol}')
     elif type == 'std':
-        type = 'STD'
         print(f'{fg.lyellow}Type: Standard{eol}')
+
     if full:
         print(f'{fg.lyellow}Package: Full{eol}')
     elif full is False:
@@ -101,55 +99,31 @@ def download(driver_version=None, studio_drivers=False,
         makedirs(path.abspath(output))
 
     if driver_version is None:
-        driver_versions = get_driver_versions(
-            studio_drivers=studio_drivers, type=type)
-    else:
-        driver_versions = driver_version,
+        driver_version = get_driver_versions(studio_drivers=studio_drivers, type=type)[0]
 
     match studio_drivers:
         case True:
             prefix = 'Studio'
-            match system_type():
-                case 'notebook':
-                    driver_links = STUDIO_NOTEBOOK_LINKS[type]
-                    info('Links Category: Studio Notebook')
-
-                case 'desktop':
-                    driver_links = STUDIO_DESKTOP_LINKS[type]
-                    info('Links Category: Studio Desktop')
-
         case False:
             prefix = 'Game Ready'
-            match system_type():
-                case 'notebook':
-                    driver_links = GR_NOTEBOOK_LINKS[type]
-                    info('Links Category: Game Ready Notebook')
 
-                case 'desktop':
-                    driver_links = GR_DESKTOP_LINKS[type]
-                    info('Links Category: Game Ready Desktop')
+    info(f'Links Category: {prefix} {system_type().capitalize()}')
     
-    # Quadro Card Detection.
-    try:
-        float(driver_versions[0])
-    except ValueError:
-        driver_versions = driver_versions[0].split('(')[1].strip(')').strip(),
-        driver_links = QUADRO_LINKS
-
-    filepath = f'{output}/{type} {prefix} - {driver_versions[0]}'
+    driver_links = dl_links(driver_version, studio_drivers, type)
+    filepath = f'{output}/{type.upper()} {prefix} - {driver_version}'
     print(f'{fg.lbeige}Checking Links...{eol}')
     for index, driver_link in enumerate(driver_links):
         try:
-            if urlopen(f'{driver_link}'.format(driver_version=driver_versions[0])).getcode() == 200:
+            if urlopen(f'{driver_link}'.format(driver_version=driver_version)).getcode() == 200:
                 
-                info(f'Queried version is valid: {driver_versions[0]}')
+                info(f'Queried version is valid: {driver_version}')
                 info(f'Valid Link: {driver_link}'.format(
-                    driver_version=driver_versions[0]))
+                    driver_version=driver_version))
                 print(
                     f'{fg.lbeige}Queried version is valid, now downloading NVIDIA driver package...{eol}')
 
                 curl_cmd = f'curl.exe -#L "{driver_link}" -o "{filepath}.exe"'.format(
-                    driver_version=driver_versions[0])
+                    driver_version=driver_version)
                 info(f'Curl Command: {curl_cmd}')
                 if run(curl_cmd).returncode == 0:
                     if full is False:
