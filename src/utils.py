@@ -140,10 +140,6 @@ def dl_links(version, studio=False, type='dch'):
     links = []
     channel = ''
     BASE_LINK = 'https://international.download.nvidia.com/Windows'
-    try:
-        float(version)
-    except ValueError:
-        version = version.split('(')[1].strip(')').strip()
 
     system = system_type()
 

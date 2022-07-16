@@ -69,6 +69,10 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
         if fnmatch(line, '<td class="gridItem">*.*</td>'):
             driver_version = line.split('>')[1].split('<')[0]
             if driver_version != '':
+                try: 
+                    float(driver_version)
+                except ValueError:
+                    driver_version = driver_version.split('(')[1].strip(')').strip()
                 driver_versions += driver_version,
 
     if len(driver_versions) == 0:
@@ -227,16 +231,16 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
         print(f'{fg.lyellow}Type: Studio{eol}')
     else:
         print(f'{fg.lyellow}Type: Game Ready{eol}')
-    latest_driver_versions = literal_eval(
+    latest_driver_version = literal_eval(
         get_driver_versions(studio_drivers=studio_drivers)[0])
     installed_driver_version = get_installed_driver_version()
 
-    if installed_driver_version == latest_driver_versions:
+    if installed_driver_version == latest_driver_version:
         print(f'{fg.lgreen}The latest driver has been installed.{eol}')
         info('The latest driver has been installed.')
         exit(0)
 
-    elif installed_driver_version > latest_driver_versions:
+    elif installed_driver_version > latest_driver_version:
         texts = (
             f'{fg.lblue}Do you want to downgrade your driver?',
             f'{fg.lblue}Downgrade?',
