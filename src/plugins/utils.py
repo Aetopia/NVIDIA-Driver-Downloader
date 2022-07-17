@@ -2,9 +2,9 @@ from wmi import WMI
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumValue
 from subprocess import run
 from pathlib import Path
-from textformat import fg, eol
+from plugins.textformat import fg, eol
 from logging import basicConfig, info, error
-from helpers import *
+from plugins.helpers import gpus, pciids
 from tempfile import gettempdir
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',

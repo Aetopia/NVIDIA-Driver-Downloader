@@ -9,9 +9,9 @@ from urllib.error import HTTPError
 from pathlib import Path
 from fnmatch import fnmatch
 from subprocess import run
-from utils import dl_links, get_archiver, get_installed_driver_version, system_type, get_psid_pfid
+from plugins.utils import dl_links, get_archiver, get_installed_driver_version, system_type, get_psid_pfid
 from ast import literal_eval
-from textformat import fg, eol
+from plugins.textformat import fg, eol
 from logging import basicConfig, info, error, warning
 from sys import exit
 
