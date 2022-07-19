@@ -3,10 +3,10 @@ from core.constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PR
 from core.functions import get_driver_versions, download, flags, extract, update
 from plugins.textformat import fg, eol
 from os import getcwd, path
-from sys import argv, exit
 import sys
 from tempfile import gettempdir
 from logging import basicConfig, info, error
+from plugins.files import init
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
@@ -16,7 +16,7 @@ def cli(argv):
                             formatter_class=RawDescriptionHelpFormatter,
                             add_help=False, usage=SUPPRESS)
 
-    parser.add_argument('--help', action='help', help=SUPPRESS)
+    parser.add_argument('-h', '--help', action='store_true', help=SUPPRESS)
 
     arguments = parser.add_argument_group(title=' Arguments',
                                           description=HELP_ARGUMENTS)\
@@ -86,11 +86,15 @@ def cli(argv):
     parser.add_argument('--no-stdout',
                         action='store_true',
                         help=SUPPRESS)
-    parse(parser.parse_args(argv), argv, parser)
+    parse(parser.parse_known_args(argv), argv, parser)
 
 def parse(args, argv, parser):
+    args = args[0]
     info(f'Namespace: {args}')
     info(f'Arguments: {argv}')
+
+    if args.help:
+        argv = []
 
     flags(args.flags)
     if args.no_stdout:
@@ -102,10 +106,10 @@ def parse(args, argv, parser):
                 or '--extract' in argv or '-e' in argv
                 or '-ls' in argv or '--list' in argv):
             parser.print_usage()
-            print(f'{fg.lred}Error: Options must be used with arguments.{eol}')
-            error('Options must be used with arguments.')
-            exit()
+            error('No arguments detected.')
+            raise Exception('No arguments detected.')
 
+        init()
         if args.output is None:
             args.output = getcwd()
         match args.studio:

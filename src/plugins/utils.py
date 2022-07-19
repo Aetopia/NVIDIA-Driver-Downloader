@@ -4,7 +4,7 @@ from subprocess import run
 from pathlib import Path
 from plugins.textformat import fg, eol
 from logging import basicConfig, info, error
-from plugins.helpers import gpus, pciids
+from plugins.files import gpus, pciids
 from tempfile import gettempdir
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
@@ -14,7 +14,7 @@ basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
 
 
 def get_psid_pfid() -> tuple:
-    gpu_list = gpus()
+    gpu_list = gpus().read()
     detected_gpu = get_gpu()
 
     for gpu in gpu_list.keys():
@@ -23,11 +23,14 @@ def get_psid_pfid() -> tuple:
 
 
 def get_gpu(log=True):
-    def message(): print(f'{fg.lred}Error: No NVIDIA GPU Detected.{eol}'); error(
-        'No NVIDIA GPU Detected.'); exit(1)
     """
     Get the GPU name using a Hardware ID.
     """
+
+    def message():
+        error('No NVIDIA GPU Detected.')
+        raise Exception('No NVIDIA GPU Detected.')
+        
     vendor_filter = '10DE'
     devices = ()
 
@@ -48,7 +51,7 @@ def get_gpu(log=True):
         message()
     for device in devices:
         try:
-            gpu = pciids()['10DE'][1][device]
+            gpu = pciids().read()['10DE'][1][device]
         except KeyError:
             message()
 
@@ -72,9 +75,8 @@ def system_type() -> str:
     elif type in (3, 4, 5, 6, 7, 15, 16):
         return 'desktop'
     else:
-        print(f"{fg.lred}Error: Couldn't detect system type.{eol}")
         error('Couldn\'t detect system type.')
-        exit(1)
+        raise Exception('Couldn\'t detect system type.')
 
 
 def get_drives():
@@ -89,9 +91,9 @@ def get_installed_driver_version() -> float:
         query_key = OpenKey(HKEY_LOCAL_MACHINE,
                             r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
     except FileNotFoundError:
-        print(f'{fg.lred}Error: NVIDIA Display Driver is not installed.{eol}')
         error('NVIDIA Display Driver is not installed.')
-        exit(1)
+        raise Exception('NVIDIA Display Driver is not installed.')
+
     index = 0
     while True:
         try:
@@ -100,40 +102,11 @@ def get_installed_driver_version() -> float:
                 try:
                     return float(value)
                 except ValueError:
-                    print(
-                        f'{fg.lred}Error: NVIDIA Display Driver is not installed.{eol}')
                     error('NVIDIA Display Driver is not installed.')
-                    exit(1)
+                    raise Exception('NVIDIA Display Driver is not installed.')
         except OSError:
             break
         index += 1
-
-
-def get_archiver():
-    drives = get_drives()
-    returncode = None
-    try:
-        for drive in drives:
-            for archiver in Path(drive).rglob('*7z.exe'):
-
-                try:
-                    info(f'Running: "{archiver}"')
-                    returncode = run(archiver, capture_output=True).returncode
-                except FileNotFoundError:
-                    returncode = None
-                except OSError:
-                    returncode = None
-
-                if returncode == 0:
-                    break
-            if returncode == 0:
-                break
-        info(f'Usable Archiver Found: "{archiver}"')
-        return f'"{archiver}"'
-    except UnboundLocalError:
-        print(f"{fg.lred}Error: Couldn't find a usable archiving program.{eol}")
-        error('Couldn\'t find a usable archiving program.')
-        exit(1)
 
 
 def dl_links(version, studio=False, type='dch'):

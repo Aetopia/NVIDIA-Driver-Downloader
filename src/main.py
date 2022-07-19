@@ -14,24 +14,30 @@ from core.cli import cli
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
-
-if __name__ == '__main__':
+def main():
     try:
+        print('\033[?25l', end='')
         cli(argv[1:])
         info('Finished!')
+        print('\033[?25h', end='\r')
         exit(0)
     except KeyboardInterrupt:
         print(f'\n{fg.lred}Warning: Operation Cancelled.{eol}')
         warning('Operation Cancelled.')
+        print('\033[?25h', end='\r')
         _exit(1)
 
     except Exception as e:
         print(
-            f'\n{fg.lred}Error: Found an uncatchable exception!\n> {e}\n')
+            f'\n{fg.lred}An error as occured.\n> {e}\n')
         print(f'Check out the log and traceback files for more details.\nLog: "%TEMP%\\nvddl.log"\nTraceback: "%TEMP%\\nvddl_traceback.txt"{eol}')
         error('Found an uncatchable exception!')
         error(f'Exception: {e}')
         with open(f'{gettempdir()}/nvddl_traceback.txt', 'w') as f:
             f.write(format_exc())
         info('Exiting...')
+        print('\033[?25h', end='\r')
         _exit(1)
+
+if __name__ == '__main__':
+    main()

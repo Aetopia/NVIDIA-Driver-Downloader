@@ -1,6 +1,6 @@
 # Modules
 from shutil import rmtree
-from constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
+from core.constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
 from os import makedirs, path
 from tempfile import gettempdir
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
@@ -9,11 +9,11 @@ from urllib.error import HTTPError
 from pathlib import Path
 from fnmatch import fnmatch
 from subprocess import run
-from plugins.utils import dl_links, get_archiver, get_installed_driver_version, system_type, get_psid_pfid
+from plugins.utils import dl_links, get_installed_driver_version, system_type, get_psid_pfid
 from ast import literal_eval
 from plugins.textformat import fg, eol
 from logging import basicConfig, info, error, warning
-from sys import exit
+from plugins.files import archiver
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
@@ -29,9 +29,8 @@ def flags(flags: list = []) -> None:
         for flag in flags:
             match flag.lower():
                 case _:
-                    print(f'{fg.lred}Error: Invalid Flag > {flag}{eol}')
                     error(f'Invalid Flag > {flag}')
-                    exit(1)
+                    raise Exception(f'Invalid Flag > {flag}')
 
         for text in flags_verbose:
             print(text)
@@ -76,9 +75,8 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
                 driver_versions += driver_version,
 
     if len(driver_versions) == 0:
-        print(f"{fg.lred}Error: Couldn't find any valid driver versions.{eol}")
         error(f'Couldn\'t find any valid driver versions.')
-        exit(1)
+        raise Exception(f'Couldn\'t find any valid driver versions.')
     return driver_versions
 
 # Download an NVIDIA Driver Package.
@@ -148,9 +146,8 @@ def download(driver_version=None, studio_drivers=False,
 
         except HTTPError:
             if index == len(driver_links)-1:
-                print(f"{fg.lred}Error: Queried version isn't valid!{eol}")
                 error('Queried version isn\'t valid!')
-                exit(1)
+                raise Exception('Queried version isn\'t valid!')
             else:
                 info(f'Invalid Link: {driver_link}')
 
@@ -159,9 +156,8 @@ def download(driver_version=None, studio_drivers=False,
 
 def extract(driver_file, output=gettempdir(), components: list = [], full=False, setup=False):
     if path.isfile(driver_file) is False:
-        print(f"{fg.lred}Error: Specified input is not a file.{eol}")
         error('Specified input is not a file.')
-        exit(1)
+        raise Exception('Specified input is not a file.')
 
     # Initialize
     if full is False:
@@ -170,10 +166,9 @@ def extract(driver_file, output=gettempdir(), components: list = [], full=False,
                 case 'audio': components[index] = 'HDAudio'
                 case 'physx': components[index] = 'PhysX'
                 case _:
-                    print(f'{fg.lred}Error: Invalid component(s) specified.{eol}')
                     error(
                         f'Invalid component(s) specified. | {component}')
-                    exit(1)
+                    raise Exception(f'Invalid component(s) specified. | {component}')
         components += BASE_COMPONENTS
         info(f'Selected Components: {components}')
     else:
@@ -185,8 +180,7 @@ def extract(driver_file, output=gettempdir(), components: list = [], full=False,
         rmtree(output)
 
     # Extract
-    archiver = get_archiver()
-    archiver_cmd = f'{archiver} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"'
+    archiver_cmd = f'{archiver()} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"'
     info(f'Archiver Command: {archiver_cmd}')
     if run(archiver_cmd).returncode == 0:
 
@@ -238,7 +232,6 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
     if installed_driver_version == latest_driver_version:
         print(f'{fg.lgreen}The latest driver has been installed.{eol}')
         info('The latest driver has been installed.')
-        exit(0)
 
     elif installed_driver_version > latest_driver_version:
         texts = (
