@@ -3,7 +3,6 @@ from urllib.request import urlopen, urlretrieve
 from xml.etree import ElementTree
 from tempfile import gettempdir
 from ast import literal_eval
-from plugins.textformat import fg, eol
 
 class pciids:
     def __init__(self):
@@ -83,10 +82,3 @@ def archiver():
     if path.exists(file) is False:
         urlretrieve(link, file)
     return file
-
-def init():
-    print(f'{fg.lgreen}Fetching GPU List...', end='\r')
-    gpus().fetch()
-    print('Fetching PCIIDS...', end='\r')
-    pciids().fetch()
-    print('\033[2K', end='\r')

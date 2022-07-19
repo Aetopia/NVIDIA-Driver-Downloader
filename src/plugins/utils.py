@@ -1,8 +1,7 @@
+from urllib.error import HTTPError
+from urllib.request import urlopen
 from wmi import WMI
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumValue
-from subprocess import run
-from pathlib import Path
-from plugins.textformat import fg, eol
 from logging import basicConfig, info, error
 from plugins.files import gpus, pciids
 from tempfile import gettempdir
@@ -30,7 +29,7 @@ def get_gpu(log=True):
     def message():
         error('No NVIDIA GPU Detected.')
         raise Exception('No NVIDIA GPU Detected.')
-        
+
     vendor_filter = '10DE'
     devices = ()
 

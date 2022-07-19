@@ -1,12 +1,12 @@
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
-from core.constants import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
+from core.strings import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from core.functions import get_driver_versions, download, flags, extract, update
 from plugins.textformat import fg, eol
 from os import getcwd, path
 import sys
 from tempfile import gettempdir
 from logging import basicConfig, info, error
-from plugins.files import init
+from plugins.files import pciids, gpus 
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
@@ -109,7 +109,7 @@ def parse(args, argv, parser):
             error('No arguments detected.')
             raise Exception('No arguments detected.')
 
-        init()
+        gpus().fetch();pciids().fetch()
         if args.output is None:
             args.output = getcwd()
         match args.studio:
