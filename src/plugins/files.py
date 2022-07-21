@@ -43,14 +43,14 @@ class pciids:
             except IndexError:
                 pass
 
-        with open(self.file, 'w') as f:
+        with open(self.file, 'w', encoding='UTF-8') as f:
             f.write(str(response))
     
     def read(self):
         if path.exists(self.file) is False:
             self.fetch()
 
-        with open(self.file, 'r') as f:
+        with open(self.file, 'r', encoding='UTF-8') as f:
             return literal_eval(f.read())
 
 # Parse the GPU List XML file into a dictionary.
@@ -67,13 +67,13 @@ class gpus():
         for index, tag in enumerate(xml.findall('LookupValues/LookupValue')):
             response[tag[0].text] = {'PSID': str(index), 'PFID': tag[1].text}
 
-        with open(self.file, 'w') as f:
+        with open(self.file, 'w', encoding='UTF-8') as f:
             f.write(str(response))
     
     def read(self):
         if path.exists(self.file) is False:
             self.fetch()
-        with open(self.file, 'r') as f:
+        with open(self.file, 'r', encoding='UTF-8') as f:
             return literal_eval(f.read())
 
 def archiver():
