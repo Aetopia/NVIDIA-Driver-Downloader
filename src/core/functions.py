@@ -58,6 +58,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
 
     psid, pfid = get_psid_pfid()
     link = API_LINK.format(psid=psid, pfid=pfid, whql=whql, dtcid=dtcid)
+    link = 'https://www.nvidia.com/Download/processFind.aspx?psid=543&pfid=874&osid=57&lid=1&whql=1&ctk=0&dtcid=1'
     info(F'API Link Generated: {link}')
     driver_versions = ()
 
@@ -232,6 +233,7 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
     if installed_driver_version == latest_driver_version:
         print(f'{fg.lgreen}The latest driver has been installed.{eol}')
         info('The latest driver has been installed.')
+        return
 
     elif installed_driver_version > latest_driver_version:
         texts = (
@@ -239,7 +241,7 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
             f'{fg.lblue}Downgrade?',
             f"{fg.lred}The currently installed driver will not be downgraded.")
 
-    else:
+    elif installed_driver_version < latest_driver_version:
         texts = (
             f'{fg.lblue}Your current driver is outdated! Please update!',
             f'{fg.lblue}Update?',
@@ -251,9 +253,8 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
         if option.lower().strip() in ('y', 'yes', ''):
             download(full=full, studio_drivers=studio_drivers,
                      components=components, setup=setup)
-            info(f'Update/Downgrade Selected.')
-            break
         elif option.lower().strip() in ('n', 'no'):
             print(texts[2]+eol)
-            info('Update/Downgrade cancelled.')
-            break
+            
+        info(f'Update/Downgrade Selected.')
+        return
