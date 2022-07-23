@@ -10,7 +10,6 @@ from pathlib import Path
 from fnmatch import fnmatch
 from subprocess import run
 from plugins.utils import dl_links, get_installed_driver_version, system_type, get_psid_pfid
-from ast import literal_eval
 from plugins.textformat import fg, eol
 from logging import basicConfig, info, error, warning
 from plugins.files import archiver
@@ -226,7 +225,7 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
         print(f'{fg.lyellow}Type: Studio{eol}')
     else:
         print(f'{fg.lyellow}Type: Game Ready{eol}')
-    latest_driver_version = literal_eval(
+    latest_driver_version = float(
         get_driver_versions(studio_drivers=studio_drivers)[0])
     installed_driver_version = get_installed_driver_version()
 
