@@ -1,74 +1,59 @@
-from urllib.error import HTTPError
-from urllib.request import urlopen
 from wmi import WMI
-from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumValue
-from logging import basicConfig, info, error
+from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, EnumValue
+from logging import basicConfig, error
 from plugins.files import gpus, pciids
 from tempfile import gettempdir
 
 basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
-# Get PSID and PFID of the installed NVIDIA GPU.
+# Get NVIDIA Devices.
 
 
-def get_psid_pfid() -> tuple:
+def get_devices():
+    devices = []
+    index = 0
+    key = OpenKey(HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Enum\\PCI')
+    while True:
+        try:
+            hwid = EnumKey(key, index).split('&')[0:2]
+            ven, dev = hwid[0].split('VEN_')[1], hwid[1].split('DEV_')[1]
+            if ven == '10DE':
+                try:
+                    device = pciids().read()['10DE'][1][dev]
+                except KeyError:
+                    break
+
+                if dict == type(device):
+                    devices.append(tuple(device.values())[0])
+                else:
+                    devices.append(device)
+            index += 1
+        except WindowsError:
+            break
+    if devices != []:
+        return devices
+    else:
+        error('No NVIDIA devices found.')
+        raise Exception('No NVIDIA devices found.')
+
+# Get NVIDIA GPU.
+
+
+def get_gpu() -> tuple:
     gpu_list = gpus().read()
-    detected_gpu = get_gpu()
+    devices = get_devices()
 
     for gpu in gpu_list.keys():
-        if gpu in detected_gpu:
-            return gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
-
-
-def get_gpu(log=True):
-    """
-    Get the GPU name using a Hardware ID.
-    """
-
-    def message():
-        error('No NVIDIA GPU Detected.')
-        raise Exception('No NVIDIA GPU Detected.')
-
-    vendor_filter = '10DE'
-    devices = ()
-
-    for driver in WMI().Win32_PnPSignedDriver():
-        try:
-            hwid = driver.HardwareID.split(
-                'PCI\\')[1].split('VEN_')[1].split('&')
-            vendor, device = hwid[0], hwid[1].split('DEV_')[1]
-            # 3D Video Controller is the driver installed when no suitable driver is found or installed for the given GPU.
-            if vendor == vendor_filter and (driver.DeviceClass == 'DISPLAY' or driver.DeviceName == '3D Video Controller'):
-                devices += device,
-        except AttributeError:
-            pass
-        except IndexError:
-            pass
-
-    if devices == ():
-        message()
-    for device in devices:
-        try:
-            gpu = pciids().read()['10DE'][1][device]
-        except KeyError:
-            message()
-
-        if dict == type(gpu):
-            if log:
-                info(f'Detected: {tuple(gpu.values())[0]}')
-            return tuple(gpu.values())[0]
-        else:
-            if log:
-                info(f'Detected: {gpu}')
-            return gpu
+        for device in devices:
+            if gpu in device:
+                return gpu, gpu_list[gpu]['PSID'], gpu_list[gpu]['PFID']
 
 # Detect if the device being used is a laptop or desktop. (Thanks Felipe#5555! :3)
 
 
 def system_type() -> str:
-    type = [system.wmi_property('ChassisTypes').value[0]
-            for system in WMI().Win32_SystemEnclosure()][0]
+    type = WMI().Win32_SystemEnclosure()[0].ChassisTypes[0]
     if type in (8, 9, 10, 11, 12, 14, 18, 21):
         return 'notebook'
     elif type in (3, 4, 5, 6, 7, 15, 16):
@@ -76,14 +61,6 @@ def system_type() -> str:
     else:
         error('Couldn\'t detect system type.')
         raise Exception('Couldn\'t detect system type.')
-
-
-def get_drives():
-    drives = ()
-    for drive in WMI().Win32_LogicalDisk():
-        drives += f'{drive.DeviceID}\\',
-    return drives
-
 
 def get_installed_driver_version() -> float:
     try:
@@ -123,7 +100,7 @@ def dl_links(version, studio=False, type='dch'):
         case 'dch': type = '-dch'
         case 'std': type = ''
 
-    if 'quadro' in str(get_gpu(log=False)).lower():
+    if 'quadro' in get_gpu()[0].lower():
         channel = 'Quadro_Certified/'
         system = 'quadro-rtx-desktop-notebook'
 

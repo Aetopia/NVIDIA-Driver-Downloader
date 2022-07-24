@@ -1,5 +1,6 @@
 # Modules
 from shutil import rmtree
+from typing import Type
 from core.constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
 from os import makedirs, path
 from tempfile import gettempdir
@@ -9,7 +10,7 @@ from urllib.error import HTTPError
 from pathlib import Path
 from fnmatch import fnmatch
 from subprocess import run
-from plugins.utils import dl_links, get_installed_driver_version, system_type, get_psid_pfid
+from plugins.utils import dl_links, get_installed_driver_version, system_type, get_gpu
 from plugins.textformat import fg, eol
 from logging import basicConfig, info, error, warning
 from plugins.files import archiver
@@ -55,9 +56,15 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
         info('Selected Driver Type: Standard')
         dtcid = 0
 
-    psid, pfid = get_psid_pfid()
+    try:
+        gpu, psid, pfid = get_gpu()
+    except TypeError:
+        error('Couldn\'t get GPU!')
+        raise Exception('Couldn\'t get GPU!')
+        
     link = API_LINK.format(psid=psid, pfid=pfid, whql=whql, dtcid=dtcid)
     link = 'https://www.nvidia.com/Download/processFind.aspx?psid=543&pfid=874&osid=57&lid=1&whql=1&ctk=0&dtcid=1'
+    info(f'Detected: {gpu}')
     info(F'API Link Generated: {link}')
     driver_versions = ()
 

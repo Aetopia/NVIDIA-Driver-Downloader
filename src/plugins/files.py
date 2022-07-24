@@ -1,4 +1,3 @@
-from os import path
 from urllib.request import urlopen, urlretrieve
 from xml.etree import ElementTree
 from tempfile import gettempdir
