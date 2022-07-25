@@ -1,9 +1,7 @@
 # Modules
 from shutil import rmtree
-from typing import Type
 from core.constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
-from os import makedirs, path
-from tempfile import gettempdir
+from os import makedirs, path, getenv
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
 from urllib.request import urlopen
 from urllib.error import HTTPError
@@ -15,7 +13,7 @@ from plugins.textformat import fg, eol
 from logging import basicConfig, info, error, warning
 from plugins.files import archiver
 
-basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
+basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 # Flags -> Enables or replaces certain functions.
@@ -90,7 +88,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
 
 
 def download(driver_version=None, studio_drivers=False,
-             type='dch', output=gettempdir(),
+             type='dch', output=getenv("TEMP"),
              full=False, components: list = [],
              setup=False) -> None:
 
@@ -161,7 +159,7 @@ def download(driver_version=None, studio_drivers=False,
 # Extract a driver package with the specified components.
 
 
-def extract(driver_file, output=gettempdir(), components: list = [], full=False, setup=False):
+def extract(driver_file, output=getenv("TEMP"), components: list = [], full=False, setup=False):
     if path.isfile(driver_file) is False:
         error('Specified input is not a file.')
         raise Exception('Specified input is not a file.')

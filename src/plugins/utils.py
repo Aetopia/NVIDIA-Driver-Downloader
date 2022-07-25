@@ -2,9 +2,9 @@ from wmi import WMI
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, EnumValue
 from logging import basicConfig, error
 from plugins.files import gpus, pciids
-from tempfile import gettempdir
+from os import getenv
 
-basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
+basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 # Get NVIDIA Devices.

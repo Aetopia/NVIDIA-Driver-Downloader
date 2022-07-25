@@ -2,13 +2,12 @@ from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
 from core.strings import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from core.functions import get_driver_versions, download, flags, extract, update
 from plugins.textformat import fg, eol
-from os import getcwd, path
+from os import getcwd, path, getenv
 import sys
-from tempfile import gettempdir
 from logging import basicConfig, info, error
 from plugins.files import pciids, gpus 
 
-basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
+basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 def cli(argv):
@@ -71,7 +70,7 @@ def cli(argv):
 
     options.add_argument('--output', '-o',
                          nargs='?',
-                         default=gettempdir(),
+                         default=getenv("TEMP"),
                          action='store',
                          help=SUPPRESS,
                          metavar='Directory')

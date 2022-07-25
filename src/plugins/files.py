@@ -1,13 +1,14 @@
 from urllib.request import urlopen, urlretrieve
 from xml.etree import ElementTree
 from tempfile import gettempdir
+from os import getenv
 from ast import literal_eval
 from urllib.error import URLError
 
 
 class pciids:
     def __init__(self):
-        file = f'{gettempdir()}/pciids.txt'
+        file = f'{getenv("TEMP")}/pciids.txt'
         self.file = file
 
     def fetch(self):
@@ -64,7 +65,7 @@ class pciids:
 
 class gpus():
     def __init__(self):
-        file = f'{gettempdir()}/gpus.txt'
+        file = f'{getenv("TEMP")}/gpus.txt'
         self.file = file
 
     def fetch(self):
@@ -87,6 +88,6 @@ class gpus():
 
 
 def archiver():
-    link, file = 'https://www.7-zip.org/a/7zr.exe', f'{gettempdir()}/7zr.exe'
+    link, file = 'https://www.7-zip.org/a/7zr.exe', f'{getenv("TEMP")}/7zr.exe'
     urlretrieve(link, file)
     return file
