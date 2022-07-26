@@ -1,8 +1,10 @@
+from subprocess import run
 from wmi import WMI
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, EnumValue
-from logging import basicConfig, error
+from logging import basicConfig, error, warning
 from plugins.files import gpus, pciids
-from os import getenv
+from glob import glob
+from os import chdir, getenv
 
 basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
@@ -108,3 +110,14 @@ def dl_links(version, studio=False, type='dch'):
         links.append(
             f'{BASE_LINK}/{channel}{version}/{version}-{system}-{winver}-64bit-international{nsd}{type}-whql.exe')
     return links
+
+def install_nvcpl(filepath):
+    chdir(f'{filepath}/Display.Driver/NVCPL')
+    ps_cmd = "powershell Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion {appx}"
+    try: 
+        appx = f"{glob(f'*.appx')[0]}"
+        if run(ps_cmd.format(appx=appx)) != 0:
+            warning('Could not install the NVIDIA Control Panel.')
+    except IndexError:
+        warning('Cannot find the NVIDIA Control Panel APPX file.')
+        

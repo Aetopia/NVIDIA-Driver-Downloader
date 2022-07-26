@@ -61,6 +61,10 @@ def cli(argv):
                                 action='store_true',
                                 help=SUPPRESS)
 
+    driver_options.add_argument('--nvcpl',
+                         action='store_true',
+                         help=SUPPRESS)
+
     options.add_argument('--components', '-c',
                          action='store',
                          metavar=('Component', 'Components'),
@@ -143,7 +147,7 @@ def parse(args, argv, parser):
                 f'{fg.lyellow}Extracting ({path.split(args.extract[0])[1].strip()})...{eol}')
             extract(args.extract[0], output=args.output,
                     components=args.components,
-                    full=args.full, setup=args.setup)
+                    full=args.full, setup=args.setup, nvcpl=args.nvcpl)
 
         elif args.update is True:
             info('Updating Driver...')
@@ -158,7 +162,7 @@ def parse(args, argv, parser):
 
             download(driver_version=driver_version, studio_drivers=args.studio,
                      type=type, output=args.output,
-                     full=args.full, components=args.components, setup=args.setup)
+                     full=args.full, components=args.components, setup=args.setup, nvcpl=args.nvcpl)
 
         elif args.download is None:
             info('Downloading Driver...')
@@ -167,6 +171,6 @@ def parse(args, argv, parser):
 
             download(studio_drivers=args.studio, type=type,
                      output=args.output, full=args.full,
-                     components=args.components, setup=args.setup)
+                     components=args.components, setup=args.setup, nvcpl=args.nvcpl)
     else:
         parser.print_help()

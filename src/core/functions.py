@@ -8,7 +8,7 @@ from urllib.error import HTTPError
 from pathlib import Path
 from fnmatch import fnmatch
 from subprocess import run
-from plugins.utils import dl_links, get_installed_driver_version, system_type, get_gpu
+from plugins.utils import dl_links, get_installed_driver_version, system_type, get_gpu, install_nvcpl
 from plugins.textformat import fg, eol
 from logging import basicConfig, info, error, warning
 from plugins.files import archiver
@@ -59,7 +59,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
     except TypeError:
         error('Couldn\'t get GPU!')
         raise Exception('Couldn\'t get GPU!')
-        
+
     link = API_LINK.format(psid=psid, pfid=pfid, whql=whql, dtcid=dtcid)
     link = 'https://www.nvidia.com/Download/processFind.aspx?psid=543&pfid=874&osid=57&lid=1&whql=1&ctk=0&dtcid=1'
     info(f'Detected: {gpu}')
@@ -73,10 +73,11 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
         if fnmatch(line, '<td class="gridItem">*.*</td>'):
             driver_version = line.split('>')[1].split('<')[0]
             if driver_version != '':
-                try: 
+                try:
                     float(driver_version)
                 except ValueError:
-                    driver_version = driver_version.split('(')[1].strip(')').strip()
+                    driver_version = driver_version.split(
+                        '(')[1].strip(')').strip()
                 driver_versions += driver_version,
 
     if len(driver_versions) == 0:
@@ -90,7 +91,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
 def download(driver_version=None, studio_drivers=False,
              type='dch', output=getenv("TEMP"),
              full=False, components: list = [],
-             setup=False) -> None:
+             setup=False, nvcpl=False) -> None:
 
     if type == 'dch':
         print(f'{fg.lyellow}Type: DCH{eol}')
@@ -106,7 +107,8 @@ def download(driver_version=None, studio_drivers=False,
         makedirs(path.abspath(output))
 
     if driver_version is None:
-        driver_version = get_driver_versions(studio_drivers=studio_drivers, type=type)[0]
+        driver_version = get_driver_versions(
+            studio_drivers=studio_drivers, type=type)[0]
 
     match studio_drivers:
         case True:
@@ -115,14 +117,14 @@ def download(driver_version=None, studio_drivers=False,
             prefix = 'Game Ready'
 
     info(f'Links Category: {prefix} {system_type().capitalize()}')
-    
+
     driver_links = dl_links(driver_version, studio_drivers, type)
     filepath = f'{output}/{type.upper()} {prefix} - {driver_version}'
     print(f'{fg.lbeige}Checking Links...{eol}')
     for index, driver_link in enumerate(driver_links):
         try:
             if urlopen(f'{driver_link}'.format(driver_version=driver_version)).getcode() == 200:
-                
+
                 info(f'Queried version is valid: {driver_version}')
                 info(f'Valid Link: {driver_link}'.format(
                     driver_version=driver_version))
@@ -138,6 +140,9 @@ def download(driver_version=None, studio_drivers=False,
                             f'{fg.lbeige}Trying to extract the downloaded driver package...{eol}')
                         extract(f"{filepath}.exe", components=components,
                                 output=output, setup=setup)
+
+                        if nvcpl is True and type == 'dch' and setup is True:
+                            install_nvcpl(filepath)
 
                     elif full is True:
                         info(f'Downloaded to "{filepath}.exe"')
@@ -159,7 +164,7 @@ def download(driver_version=None, studio_drivers=False,
 # Extract a driver package with the specified components.
 
 
-def extract(driver_file, output=getenv("TEMP"), components: list = [], full=False, setup=False):
+def extract(driver_file, output=getenv("TEMP"), components: list = [], full=False, setup=False, nvcpl=False):
     if path.isfile(driver_file) is False:
         error('Specified input is not a file.')
         raise Exception('Specified input is not a file.')
@@ -173,7 +178,8 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
                 case _:
                     error(
                         f'Invalid component(s) specified. | {component}')
-                    raise Exception(f'Invalid component(s) specified. | {component}')
+                    raise Exception(
+                        f'Invalid component(s) specified. | {component}')
         components += BASE_COMPONENTS
         info(f'Selected Components: {components}')
     else:
@@ -191,7 +197,8 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
 
         if full is False:
             with open(f'{output}/setup.cfg', 'r+', encoding='UTF-8') as cfg:
-                content = cfg.read().splitlines(); cfg.seek(0)
+                content = cfg.read().splitlines()
+                cfg.seek(0)
                 for line in cfg.read().splitlines():
                     if line.strip() in SETUP:
                         content.pop(content.index(line))
@@ -216,11 +223,15 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
             file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
         Popen(file, shell=True, stdout=DEVNULL, stderr=STDOUT,
               cwd=output, creationflags=DETACHED_PROCESS)
+        
+        if setup is True and nvcpl is True:
+            install_nvcpl(output)
+        
 
     else:
-        print(
-            f'{fg.lred}Error: Something went wrong while extracting the specified driver package.{eol}')
         error('Something went wrong while extracting the specified driver package.')
+        raise Exception(
+            'Something went wrong while extracting the specified driver package.')
 # Check if your NVIDIA driver is outdated or not.
 
 
@@ -259,6 +270,6 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
                      components=components, setup=setup)
         elif option.lower().strip() in ('n', 'no'):
             print(texts[2]+eol)
-            
+
         info(f'Update/Downgrade Selected.')
         return
