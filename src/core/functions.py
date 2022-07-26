@@ -1,6 +1,6 @@
 # Modules
 from shutil import rmtree
-from core.constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
+from data.constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
 from os import makedirs, path, getenv
 from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
 from urllib.request import urlopen

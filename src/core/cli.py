@@ -1,5 +1,5 @@
 from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
-from core.strings import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
+from data.strings import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
 from core.functions import get_driver_versions, download, flags, extract, update
 from plugins.textformat import fg, eol
 from os import getcwd, path, getenv

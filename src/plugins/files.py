@@ -1,6 +1,5 @@
 from urllib.request import urlopen, urlretrieve
 from xml.etree import ElementTree
-from tempfile import gettempdir
 from os import getenv
 from ast import literal_eval
 from urllib.error import URLError
