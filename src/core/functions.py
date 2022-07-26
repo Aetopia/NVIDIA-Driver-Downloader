@@ -120,6 +120,7 @@ def download(driver_version=None, studio_drivers=False,
 
     driver_links = dl_links(driver_version, studio_drivers, type)
     filepath = f'{output}/{type.upper()} {prefix} - {driver_version}'
+
     print(f'{fg.lbeige}Checking Links...{eol}')
     for index, driver_link in enumerate(driver_links):
         try:
@@ -135,14 +136,12 @@ def download(driver_version=None, studio_drivers=False,
                     driver_version=driver_version)
                 info(f'Curl Command: {curl_cmd}')
                 if run(curl_cmd).returncode == 0:
+                    
                     if full is False:
                         print(
                             f'{fg.lbeige}Trying to extract the downloaded driver package...{eol}')
                         extract(f"{filepath}.exe", components=components,
-                                output=output, setup=setup)
-
-                        if nvcpl is True and type == 'dch' and setup is True:
-                            install_nvcpl(filepath)
+                                output=output, setup=setup, nvcpl=nvcpl)
 
                     elif full is True:
                         info(f'Downloaded to "{filepath}.exe"')
@@ -223,10 +222,9 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
             file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
         Popen(file, shell=True, stdout=DEVNULL, stderr=STDOUT,
               cwd=output, creationflags=DETACHED_PROCESS)
-        
+
         if setup is True and nvcpl is True:
             install_nvcpl(output)
-        
 
     else:
         error('Something went wrong while extracting the specified driver package.')
