@@ -61,7 +61,6 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
         raise Exception('Couldn\'t get GPU!')
 
     link = API_LINK.format(psid=psid, pfid=pfid, whql=whql, dtcid=dtcid)
-    link = 'https://www.nvidia.com/Download/processFind.aspx?psid=543&pfid=874&osid=57&lid=1&whql=1&ctk=0&dtcid=1'
     info(f'Detected: {gpu}')
     info(F'API Link Generated: {link}')
     driver_versions = ()
