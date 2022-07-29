@@ -222,7 +222,7 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
         Popen(file, shell=True, stdout=DEVNULL, stderr=STDOUT,
               cwd=output, creationflags=DETACHED_PROCESS)
 
-        if setup is True and nvcpl is True:
+        if nvcpl is True:
             install_nvcpl(output)
 
     else:

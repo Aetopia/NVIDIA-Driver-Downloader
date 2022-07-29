@@ -1,10 +1,10 @@
-from subprocess import run
 from wmi import WMI
 from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, EnumValue
-from logging import basicConfig, error, warning
+from logging import basicConfig, error, info, warning
 from plugins.files import gpus, pciids
 from glob import glob
-from os import chdir, getenv
+from os import getenv, makedirs
+from shutil import unpack_archive
 
 basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
@@ -64,6 +64,7 @@ def system_type() -> str:
         error('Couldn\'t detect system type.')
         raise Exception('Couldn\'t detect system type.')
 
+
 def get_installed_driver_version() -> float:
     try:
         query_key = OpenKey(HKEY_LOCAL_MACHINE,
@@ -111,13 +112,22 @@ def dl_links(version, studio=False, type='dch'):
             f'{BASE_LINK}/{channel}{version}/{version}-{system}-{winver}-64bit-international{nsd}{type}-whql.exe')
     return links
 
+
 def install_nvcpl(filepath):
-    chdir(f'{filepath}/Display.Driver/NVCPL')
-    ps_cmd = "powershell Add-AppxPackage -ForceApplicationShutdown -ForceUpdateFromAnyVersion {appx}"
-    try: 
-        appx = f"{glob(f'*.appx')[0]}"
-        if run(ps_cmd.format(appx=appx)) != 0:
-            warning('Could not install the NVIDIA Control Panel.')
+    try:
+        info('Installing the NVIDIA Control Panel...')
+        appxfile = glob(f'{filepath}/Display.Driver/NVCPL/*.appx')[0]
+        nvcpl_url = f'{getenv("APPDATA")}/Microsoft/Windows/Start Menu/Programs/NVIDIA Control Panel.url'
+        nvcpl_dir = f'{getenv("APPDATA")}/NVDDL/NVCPL'
+
+        info('Installing the NVIDIA Control Panel...')
+        makedirs(nvcpl_dir, exist_ok=True)
+        unpack_archive(appxfile, nvcpl_dir, format='zip')
+        with open(nvcpl_url, mode='w', newline='\r\n') as f:
+            f.write(f'''[InternetShortcut]
+URL=file:///{nvcpl_dir}/nvcplui.exe
+IconIndex=0
+IconFile={nvcpl_dir}/nvcplui.exe''')
+
     except IndexError:
-        warning('Cannot find the NVIDIA Control Panel APPX file.')
-        
+        warning('Cannot install the NVIDIA Control Panel.')
