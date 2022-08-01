@@ -3,13 +3,14 @@
 # Discord: https://dsc.gg/CTT
 # Under the MIT License: https://github.com/Aetopia/NVIDIA-Driver-Downloader/blob/main/LICENSE.md
 
-from traceback import format_exc
-from plugins.textformat import fg, eol
-from os import _exit
-from tempfile import gettempdir
 import logging
+from os import _exit
 from sys import argv, exit
+from tempfile import gettempdir
+from traceback import format_exc
+
 from core.cli import cli
+from plugins.textformat import eol, fg
 
 logging.basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')

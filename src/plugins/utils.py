@@ -1,10 +1,12 @@
-from wmi import WMI
-import winreg 
-import logging 
-from plugins.files import *
+import logging
+import os
+import winreg
 from glob import glob
-import os 
 from shutil import unpack_archive
+
+from wmi import WMI
+
+from plugins.files import *
 
 logging.basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
