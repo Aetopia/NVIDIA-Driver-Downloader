@@ -1,20 +1,20 @@
 # Modules
-from shutil import rmtree
-from data.constants import API_LINK, BASE_COMPONENTS, SETUP, PRESENTATIONS  # constants.py
-from os import makedirs, path, getenv
-from subprocess import Popen, DEVNULL, STDOUT, DETACHED_PROCESS
-from urllib.request import urlopen
-from urllib.error import HTTPError
-from pathlib import Path
+import logging
+import os
+import subprocess as sp
 from fnmatch import fnmatch
-from subprocess import run
-from plugins.utils import dl_links, get_installed_driver_version, system_type, get_gpu, install_nvcpl
-from plugins.textformat import fg, eol
-from logging import basicConfig, info, error, warning
-from plugins.files import archiver
+from pathlib import Path
+from shutil import rmtree
+from urllib.error import HTTPError
+from urllib.request import urlopen
 
-basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
-            format='%(levelname)s: %(message)s', level='INFO')
+import data.constants as csts
+import plugins.utils as utils
+from plugins.files import archiver
+from plugins.textformat import eol, fg
+
+logging.basicConfig(filename=f'{os.getenv("TEMP")}/nvddl.log', filemode='w+',
+                    format='%(levelname)s: %(message)s', level='INFO')
 
 # Flags -> Enables or replaces certain functions.
 
@@ -22,12 +22,12 @@ basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
 def flags(flags: list = []) -> None:
     if flags != []:
         print(f'{fg.lred}Warning: Using Flags!{eol}')
-        warning(f'Using Flags!')
+        logging.warning(f'Using Flags!')
         flags_verbose = ()
         for flag in flags:
             match flag.lower():
                 case _:
-                    error(f'Invalid Flag > {flag}')
+                    logging.error(f'Invalid Flag > {flag}')
                     raise Exception(f'Invalid Flag > {flag}')
 
         for text in flags_verbose:
@@ -41,28 +41,28 @@ def flags(flags: list = []) -> None:
 
 def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
     if studio_drivers:
-        info('Selected Driver Type: Studio')
+        logging.info('Selected Driver Type: Studio')
         whql = 4
     else:
-        info('Selected Driver Type: Game Ready')
+        logging.info('Selected Driver Type: Game Ready')
         whql = 1
 
     if type.lower() == 'dch':
-        info('Selected Driver Type: DCH')
+        logging.info('Selected Driver Type: DCH')
         dtcid = 1
     elif type.lower() == 'std':
-        info('Selected Driver Type: Standard')
+        logging.info('Selected Driver Type: Standard')
         dtcid = 0
 
     try:
-        gpu, psid, pfid = get_gpu()
+        gpu, psid, pfid = utils.get_gpu()
     except TypeError:
-        error('Couldn\'t get GPU!')
+        logging.error('Couldn\'t get GPU!')
         raise Exception('Couldn\'t get GPU!')
 
-    link = API_LINK.format(psid=psid, pfid=pfid, whql=whql, dtcid=dtcid)
-    info(f'Detected: {gpu}')
-    info(F'API Link Generated: {link}')
+    link = csts.API_LINK.format(psid=psid, pfid=pfid, whql=whql, dtcid=dtcid)
+    logging.info(f'Detected: {gpu}')
+    logging.info(F'API Link Generated: {link}')
     driver_versions = ()
 
     with urlopen(link) as file:
@@ -80,7 +80,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
                 driver_versions += driver_version,
 
     if len(driver_versions) == 0:
-        error(f'Couldn\'t find any valid driver versions.')
+        logging.error(f'Couldn\'t find any valid driver versions.')
         raise Exception(f'Couldn\'t find any valid driver versions.')
     return driver_versions
 
@@ -88,7 +88,7 @@ def get_driver_versions(studio_drivers=False, type='dch') -> tuple:
 
 
 def download(driver_version=None, studio_drivers=False,
-             type='dch', output=getenv("TEMP"),
+             type='dch', output=os.getenv("TEMP"),
              full=False, components: list = [],
              setup=False, nvcpl=False) -> None:
 
@@ -102,8 +102,8 @@ def download(driver_version=None, studio_drivers=False,
     elif full is False:
         print(f'{fg.lyellow}Package: Custom{eol}')
 
-    if path.exists(output) is False:
-        makedirs(path.abspath(output))
+    if os.path.exists(output) is False:
+        os.makedirs(os.path.abspath(output))
 
     if driver_version is None:
         driver_version = get_driver_versions(
@@ -115,9 +115,10 @@ def download(driver_version=None, studio_drivers=False,
         case False:
             prefix = 'Game Ready'
 
-    info(f'Links Category: {prefix} {system_type().capitalize()}')
+    logging.info(
+        f'Links Category: {prefix} {utils.system_type().capitalize()}')
 
-    driver_links = dl_links(driver_version, studio_drivers, type)
+    driver_links = utils.dl_links(driver_version, studio_drivers, type)
     filepath = f'{output}/{type.upper()} {prefix} - {driver_version}'
 
     print(f'{fg.lbeige}Checking Links...{eol}')
@@ -125,17 +126,17 @@ def download(driver_version=None, studio_drivers=False,
         try:
             if urlopen(f'{driver_link}'.format(driver_version=driver_version)).getcode() == 200:
 
-                info(f'Queried version is valid: {driver_version}')
-                info(f'Valid Link: {driver_link}'.format(
+                logging.info(f'Queried version is valid: {driver_version}')
+                logging.info(f'Valid Link: {driver_link}'.format(
                     driver_version=driver_version))
                 print(
                     f'{fg.lbeige}Queried version is valid, now downloading NVIDIA driver package...{eol}')
 
                 curl_cmd = f'curl.exe -#L "{driver_link}" -o "{filepath}.exe"'.format(
                     driver_version=driver_version)
-                info(f'Curl Command: {curl_cmd}')
-                if run(curl_cmd).returncode == 0:
-                    
+                logging.info(f'Curl Command: {curl_cmd}')
+                if sp.run(curl_cmd).returncode == 0:
+
                     if full is False:
                         print(
                             f'{fg.lbeige}Trying to extract the downloaded driver package...{eol}')
@@ -143,28 +144,28 @@ def download(driver_version=None, studio_drivers=False,
                                 output=output, setup=setup, nvcpl=nvcpl)
 
                     elif full is True:
-                        info(f'Downloaded to "{filepath}.exe"')
+                        logging.info(f'Downloaded to "{filepath}.exe"')
                         if setup is False:
                             file = f'"C:\Windows\explorer.exe" /select,"{Path(file)}"'
                         print(
                             f'{fg.lgreen}Downloaded to "{Path(filepath)}.exe"{eol}')
-                        Popen(f"{filepath}.exe", shell=True, stdout=DEVNULL, stderr=STDOUT,
-                              cwd=filepath, creationflags=DETACHED_PROCESS)
+                        sp.Popen(f"{filepath}.exe", shell=True, stdout=sp.DEVNULL, stderr=sp.STDOUT,
+                                 cwd=filepath, creationflags=sp.DETACHED_PROCESS)
                     break
 
         except HTTPError:
             if index == len(driver_links)-1:
-                error('Queried version isn\'t valid!')
+                logging.error('Queried version isn\'t valid!')
                 raise Exception('Queried version isn\'t valid!')
             else:
-                info(f'Invalid Link: {driver_link}')
+                logging.info(f'Invalid Link: {driver_link}')
 
 # Extract a driver package with the specified components.
 
 
-def extract(driver_file, output=getenv("TEMP"), components: list = [], full=False, setup=False, nvcpl=False):
-    if path.isfile(driver_file) is False:
-        error('Specified input is not a file.')
+def extract(driver_file, output=os.getenv("TEMP"), components: list = [], full=False, setup=False, nvcpl=False):
+    if os.path.isfile(driver_file) is False:
+        logging.error('Specified input is not a file.')
         raise Exception('Specified input is not a file.')
 
     # Initialize
@@ -174,31 +175,31 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
                 case 'audio': components[index] = 'HDAudio'
                 case 'physx': components[index] = 'PhysX'
                 case _:
-                    error(
+                    logging.error(
                         f'Invalid component(s) specified. | {component}')
                     raise Exception(
                         f'Invalid component(s) specified. | {component}')
-        components += BASE_COMPONENTS
-        info(f'Selected Components: {components}')
+        components += csts.BASE_COMPONENTS
+        logging.info(f'Selected Components: {components}')
     else:
         components = []
 
-    output = f'{output}/{path.split(path.splitext(driver_file)[0])[1]}'
+    output = f'{output}/{os.path.split(os.path.splitext(driver_file)[0])[1]}'
     file = f'{output}/setup.exe'
-    if path.exists(output):
+    if os.path.exists(output):
         rmtree(output)
 
     # Extract
     archiver_cmd = f'{archiver()} x -bso0 -bsp1 -bse1 -aoa "{driver_file}" {" ".join(components).strip()} -o"{output}"'
-    info(f'Archiver Command: {archiver_cmd}')
-    if run(archiver_cmd).returncode == 0:
+    logging.info(f'Archiver Command: {archiver_cmd}')
+    if sp.run(archiver_cmd).returncode == 0:
 
         if full is False:
             with open(f'{output}/setup.cfg', 'r+', encoding='UTF-8') as cfg:
                 content = cfg.read().splitlines()
                 cfg.seek(0)
                 for line in cfg.read().splitlines():
-                    if line.strip() in SETUP:
+                    if line.strip() in csts.SETUP:
                         content.pop(content.index(line))
             with open(f'{output}/setup.cfg', 'w', encoding='UTF-8') as cfg:
                 cfg.write('\n'.join(content))
@@ -206,27 +207,29 @@ def extract(driver_file, output=getenv("TEMP"), components: list = [], full=Fals
             with open(f'{output}/NVI2/presentations.cfg', 'r+', encoding='UTF-8') as cfg:
                 cfg = cfg.read().splitlines()
                 content = cfg
+                presentations = csts.PRESENTATIONS
                 for index, line in enumerate(cfg):
-                    if fnmatch(line, f'{PRESENTATIONS[0]}*'):
-                        content[index] = f'{PRESENTATIONS[0]} value=""/>'
-                    elif fnmatch(line, f'{PRESENTATIONS[1]}*'):
-                        content[index] = f'{PRESENTATIONS[1]} value=""/>'
+                    if fnmatch(line, f'{presentations[0]}*'):
+                        content[index] = f'{presentations[0]} value=""/>'
+                    elif fnmatch(line, f'{presentations[1]}*'):
+                        content[index] = f'{presentations[1]} value=""/>'
             with open(f'{output}/NVI2/presentations.cfg', 'w', encoding='UTF-8') as cfg:
                 cfg.write('\n'.join(content))
 
-        print(f'{fg.lgreen}Extracted to "{Path(path.abspath(output))}"{eol}')
-        info(f'Extracted to "{Path(path.abspath(output))}"')
+        print(f'{fg.lgreen}Extracted to "{Path(os.path.abspath(output))}"{eol}')
+        logging.info(f'Extracted to "{Path(os.path.abspath(output))}"')
 
         if setup is False:
             file = f'"C:\Windows\explorer.exe" /select,"{Path(str(file))}"'
-        Popen(file, shell=True, stdout=DEVNULL, stderr=STDOUT,
-              cwd=output, creationflags=DETACHED_PROCESS)
+        sp.Popen(file, shell=True, stdout=sp.DEVNULL, stderr=sp.STDOUT,
+                 cwd=output, creationflags=sp.DETACHED_PROCESS)
 
         if nvcpl is True:
-            install_nvcpl(output)
+            utils.install_nvcpl(output)
 
     else:
-        error('Something went wrong while extracting the specified driver package.')
+        logging.error(
+            'Something went wrong while extracting the specified driver package.')
         raise Exception(
             'Something went wrong while extracting the specified driver package.')
 # Check if your NVIDIA driver is outdated or not.
@@ -240,11 +243,11 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
         print(f'{fg.lyellow}Type: Game Ready{eol}')
     latest_driver_version = float(
         get_driver_versions(studio_drivers=studio_drivers)[0])
-    installed_driver_version = get_installed_driver_version()
+    installed_driver_version = utils.get_installed_driver_version()
 
     if installed_driver_version == latest_driver_version:
         print(f'{fg.lgreen}The latest driver has been installed.{eol}')
-        info('The latest driver has been installed.')
+        logging.info('The latest driver has been installed.')
         return
 
     elif installed_driver_version > latest_driver_version:
@@ -268,5 +271,5 @@ def update(studio_drivers=False, full=False, components: list = [], setup=False)
         elif option.lower().strip() in ('n', 'no'):
             print(texts[2]+eol)
 
-        info(f'Update/Downgrade Selected.')
+        logging.info(f'Update/Downgrade Selected.')
         return

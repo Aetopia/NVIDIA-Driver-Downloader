@@ -1,18 +1,22 @@
-from argparse import ArgumentParser, SUPPRESS, RawDescriptionHelpFormatter
-from data.strings import HELP_DRIVER_OPTIONS, HELP_OPTIONS, HELP_ARGUMENTS, PROGRAM_DESCRIPTION
-from core.functions import get_driver_versions, download, flags, extract, update
-from plugins.textformat import fg, eol
-from os import getcwd, path, getenv
+import argparse as ap
+import logging
+import os
 import sys
-from logging import basicConfig, info, error
-from plugins.files import pciids, gpus 
 
-basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
+from data.strings import *
+from plugins.files import *
+from plugins.textformat import eol, fg
+
+from core.functions import *
+
+logging.basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 def cli(argv):
-    parser = ArgumentParser(description=PROGRAM_DESCRIPTION,
-                            formatter_class=RawDescriptionHelpFormatter,
+    SUPPRESS = ap.SUPPRESS
+
+    parser = ap.ArgumentParser(description=PROGRAM_DESCRIPTION,
+                            formatter_class=ap.RawDescriptionHelpFormatter,
                             add_help=False, usage=SUPPRESS)
 
     parser.add_argument('-h', '--help', action='store_true', help=SUPPRESS)
@@ -93,8 +97,8 @@ def cli(argv):
 
 def parse(args, argv, parser):
     args = args[0]
-    info(f'Namespace: {args}')
-    info(f'Arguments: {argv}')
+    logging.info(f'Namespace: {args}')
+    logging.info(f'Arguments: {argv}')
 
     if args.help:
         argv = []
@@ -109,12 +113,12 @@ def parse(args, argv, parser):
                 or '--extract' in argv or '-e' in argv
                 or '-ls' in argv or '--list' in argv):
             parser.print_usage()
-            error('No arguments detected.')
+            logging.error('No arguments detected.')
             raise Exception('No arguments detected.')
 
         gpus().fetch();pciids().fetch()
         if args.output is None:
-            args.output = getcwd()
+            args.output = os.abortgetcwd()
         match args.studio:
             case True: driver_type = 'Studio'
             case False: driver_type = 'Game Ready'
@@ -128,7 +132,7 @@ def parse(args, argv, parser):
                 driver_type = f'DCH {driver_type}'
 
         if args.list is True:
-            info('Getting Driver Versions...')
+            logging.info('Getting Driver Versions...')
             print(f'{fg.lyellow}{driver_type} Drivers:{eol}')
             driver_versions = get_driver_versions(
                 studio_drivers=args.studio, type=type)
@@ -142,20 +146,20 @@ def parse(args, argv, parser):
                     print(f' {fg.lbeige}> {driver_version}{eol}')
 
         elif args.extract is not None:
-            info('Extracting Driver...')
+            logging.info('Extracting Driver...')
             print(
-                f'{fg.lyellow}Extracting ({path.split(args.extract[0])[1].strip()})...{eol}')
+                f'{fg.lyellow}Extracting ({os.path.split(args.extract[0])[1].strip()})...{eol}')
             extract(args.extract[0], output=args.output,
                     components=args.components,
                     full=args.full, setup=args.setup, nvcpl=args.nvcpl)
 
         elif args.update is True:
-            info('Updating Driver...')
+            logging.info('Updating Driver...')
             update(studio_drivers=args.studio,
                    components=args.components, setup=args.setup)
 
         elif args.download is not None:
-            info('Downloading Driver...')
+            logging.info('Downloading Driver...')
             print(f'{fg.lyellow}Downloading {driver_type} Driver...{eol}')
             driver_version = args.download
             print(f'{fg.lyellow}Version: {driver_version}{eol}')
@@ -165,7 +169,7 @@ def parse(args, argv, parser):
                      full=args.full, components=args.components, setup=args.setup, nvcpl=args.nvcpl)
 
         elif args.download is None:
-            info('Downloading Driver...')
+            logging.info('Downloading Driver...')
             print(
                 f'{fg.lyellow}Downloading the Latest {driver_type} Driver...{eol}')
 

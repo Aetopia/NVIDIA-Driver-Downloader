@@ -1,5 +1,3 @@
-from plugins.textformat import *
-
 # API Link.
 API_LINK = 'https://www.nvidia.com/Download/processFind.aspx?psid={psid}&pfid={pfid}&osid=57&lid=1&whql={whql}&ctk=0&dtcid={dtcid}'
 

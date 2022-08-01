@@ -1,12 +1,12 @@
 from wmi import WMI
-from winreg import HKEY_LOCAL_MACHINE, OpenKey, EnumKey, EnumValue
-from logging import basicConfig, error, info, warning
-from plugins.files import gpus, pciids
+import winreg 
+import logging 
+from plugins.files import *
 from glob import glob
-from os import getenv, makedirs
+import os 
 from shutil import unpack_archive
 
-basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
+logging.basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
             format='%(levelname)s: %(message)s', level='INFO')
 
 # Get NVIDIA Devices.
@@ -15,10 +15,10 @@ basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
 def get_devices():
     devices = []
     index = 0
-    key = OpenKey(HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Enum\\PCI')
+    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Enum\\PCI')
     while True:
         try:
-            hwid = EnumKey(key, index).split('&')[0:2]
+            hwid = winreg.EnumKey(key, index).split('&')[0:2]
             ven, dev = hwid[0].split('VEN_')[1], hwid[1].split('DEV_')[1]
             if ven == '10DE':
                 try:
@@ -36,7 +36,7 @@ def get_devices():
     if devices != []:
         return devices
     else:
-        error('No NVIDIA devices found.')
+        logging.error('No NVIDIA devices found.')
         raise Exception('No NVIDIA devices found.')
 
 # Get NVIDIA GPU.
@@ -61,27 +61,27 @@ def system_type() -> str:
     elif type in (3, 4, 5, 6, 7, 15, 16):
         return 'desktop'
     else:
-        error('Couldn\'t detect system type.')
+        logging.error('Couldn\'t detect system type.')
         raise Exception('Couldn\'t detect system type.')
 
 
 def get_installed_driver_version() -> float:
     try:
-        query_key = OpenKey(HKEY_LOCAL_MACHINE,
+        query_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
     except FileNotFoundError:
-        error('NVIDIA Display Driver is not installed.')
+        logging.error('NVIDIA Display Driver is not installed.')
         raise Exception('NVIDIA Display Driver is not installed.')
 
     index = 0
     while True:
         try:
-            key, value, _ = EnumValue(query_key, index)
+            key, value, _ = winreg.EnumValue(query_key, index)
             if key == 'DisplayVersion':
                 try:
                     return float(value)
                 except ValueError:
-                    error('NVIDIA Display Driver is not installed.')
+                    logging.error('NVIDIA Display Driver is not installed.')
                     raise Exception('NVIDIA Display Driver is not installed.')
         except OSError:
             break
@@ -115,13 +115,13 @@ def dl_links(version, studio=False, type='dch'):
 
 def install_nvcpl(filepath):
     try:
-        info('Installing the NVIDIA Control Panel...')
+        logging.info('Installing the NVIDIA Control Panel...')
         appxfile = glob(f'{filepath}/Display.Driver/NVCPL/*.appx')[0]
         nvcpl_url = f'{getenv("APPDATA")}/Microsoft/Windows/Start Menu/Programs/NVIDIA Control Panel.url'
         nvcpl_dir = f'{getenv("APPDATA")}/NVDDL/NVCPL'
 
-        info('Installing the NVIDIA Control Panel...')
-        makedirs(nvcpl_dir, exist_ok=True)
+        logging.info('Installing the NVIDIA Control Panel...')
+        os.makedirs(nvcpl_dir, exist_ok=True)
         unpack_archive(appxfile, nvcpl_dir, format='zip')
         with open(nvcpl_url, mode='w', newline='\r\n') as f:
             f.write(f'''[InternetShortcut]
@@ -130,4 +130,4 @@ IconIndex=0
 IconFile={nvcpl_dir}/nvcplui.exe''')
 
     except IndexError:
-        warning('Cannot install the NVIDIA Control Panel.')
+        logging.warning('Cannot install the NVIDIA Control Panel.')
