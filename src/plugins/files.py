@@ -1,13 +1,13 @@
 from urllib.request import urlopen, urlretrieve
 from xml.etree import ElementTree
 from os import getenv
-from ast import literal_eval
+import pickle
 from urllib.error import URLError
 
 
 class pciids:
     def __init__(self):
-        file = f'{getenv("TEMP")}/pciids.txt'
+        file = f'{getenv("TEMP")}/pciids.bin'
         self.file = file
 
     def fetch(self):
@@ -52,19 +52,19 @@ class pciids:
             except IndexError:
                 pass
 
-        with open(self.file, 'w', encoding='UTF-8') as f:
-            f.write(str(response))
+        with open(self.file, 'wb') as f:
+            pickle.dump(response, f)
 
     def read(self):
-        with open(self.file, 'r', encoding='UTF-8') as f:
-            return literal_eval(f.read())
+        with open(self.file, 'rb') as f:
+            return pickle.load(f)
 
 # Parse the GPU List XML file into a dictionary.
 
 
 class gpus():
     def __init__(self):
-        file = f'{getenv("TEMP")}/gpus.txt'
+        file = f'{getenv("TEMP")}/gpus.bin'
         self.file = file
 
     def fetch(self):
@@ -78,12 +78,12 @@ class gpus():
         for index, tag in enumerate(gpus.findall('LookupValues/LookupValue')):
             response[tag[0].text] = {'PSID': str(index), 'PFID': tag[1].text}
 
-        with open(self.file, 'w', encoding='UTF-8') as f:
-            f.write(str(response))
+        with open(self.file, 'wb') as f:
+            pickle.dump(response, f)
 
     def read(self):
-        with open(self.file, 'r', encoding='UTF-8') as f:
-            return literal_eval(f.read())
+        with open(self.file, 'rb') as f:
+            return pickle.load(f)
 
 
 def archiver():
