@@ -119,13 +119,14 @@ def dl_links(version, studio=False, type='dch'):
 def install_nvcpl(filepath):
     try:
         logging.info('Installing the NVIDIA Control Panel...')
-        appxfile = glob(f'{filepath}/Display.Driver/NVCPL/*.appx')[0]
-        nvcpl_url = f'{getenv("APPDATA")}/Microsoft/Windows/Start Menu/Programs/NVIDIA Control Panel.url'
-        nvcpl_dir = f'{getenv("APPDATA")}/NVDDL/NVCPL'
+        nvcpl_appx, nvcpl_url, nvcpl_dir = \
+            glob(f'{filepath}/Display.Driver/NVCPL/*.appx')[0], \
+            f'{getenv("APPDATA")}/Microsoft/Windows/Start Menu/Programs/NVIDIA Control Panel.url', \
+            f'{getenv("APPDATA")}/NVDDL/NVCPL'
 
         logging.info('Installing the NVIDIA Control Panel...')
         os.makedirs(nvcpl_dir, exist_ok=True)
-        unpack_archive(appxfile, nvcpl_dir, format='zip')
+        unpack_archive(nvcpl_appx, nvcpl_dir, format='zip')
         with open(nvcpl_url, mode='w', newline='\r\n') as f:
             f.write(f'''[InternetShortcut]
 URL=file:///{nvcpl_dir}/nvcplui.exe
