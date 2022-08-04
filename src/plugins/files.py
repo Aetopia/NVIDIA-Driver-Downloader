@@ -62,9 +62,9 @@ class pciids:
 # Parse the GPU List XML file into a dictionary.
 
 
-class gpus():
+class nvgpus():
     def __init__(self):
-        file = f'{getenv("TEMP")}/gpus.bin'
+        file = f'{getenv("TEMP")}/nvgpus.bin'
         self.file = file
 
     def fetch(self):

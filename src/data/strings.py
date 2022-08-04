@@ -1,4 +1,5 @@
-from plugins.textformat import fg, eol
+from plugins.textformat import eol, fg
+
 # Help
 HELP_ARGUMENTS = '''--list, -ls                        │ Show all available driver versions.
 --download, -dl <Driver Version>   │ Download the latest driver or a specified driver version.

@@ -1,4 +1,5 @@
 from os import system
+
 system('')
 
 eol = end = reset = '\33[0m'

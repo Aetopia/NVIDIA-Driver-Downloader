@@ -10,14 +10,15 @@ from plugins.textformat import eol, fg
 from core.functions import *
 
 logging.basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
-            format='%(levelname)s: %(message)s', level='INFO')
+                    format='%(levelname)s: %(message)s', level='INFO')
+
 
 def cli(argv):
     SUPPRESS = ap.SUPPRESS
 
     parser = ap.ArgumentParser(description=PROGRAM_DESCRIPTION,
-                            formatter_class=ap.RawDescriptionHelpFormatter,
-                            add_help=False, usage=SUPPRESS)
+                               formatter_class=ap.RawDescriptionHelpFormatter,
+                               add_help=False, usage=SUPPRESS)
 
     parser.add_argument('-h', '--help', action='store_true', help=SUPPRESS)
 
@@ -66,8 +67,8 @@ def cli(argv):
                                 help=SUPPRESS)
 
     driver_options.add_argument('--nvcpl',
-                         action='store_true',
-                         help=SUPPRESS)
+                                action='store_true',
+                                help=SUPPRESS)
 
     options.add_argument('--components', '-c',
                          action='store',
@@ -95,6 +96,7 @@ def cli(argv):
                         help=SUPPRESS)
     parse(parser.parse_known_args(argv), argv, parser)
 
+
 def parse(args, argv, parser):
     args = args[0]
     logging.info(f'Namespace: {args}')
@@ -116,7 +118,8 @@ def parse(args, argv, parser):
             logging.error('No arguments detected.')
             raise Exception('No arguments detected.')
 
-        gpus().fetch();pciids().fetch()
+        nvgpus().fetch()
+        pciids().fetch()
         if args.output is None:
             args.output = os.abortgetcwd()
         match args.studio:

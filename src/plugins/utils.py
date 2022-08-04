@@ -9,7 +9,7 @@ from wmi import WMI
 from plugins.files import *
 
 logging.basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
-            format='%(levelname)s: %(message)s', level='INFO')
+                    format='%(levelname)s: %(message)s', level='INFO')
 
 # Get NVIDIA Devices.
 
@@ -17,7 +17,8 @@ logging.basicConfig(filename=f'{getenv("TEMP")}/nvddl.log', filemode='w+',
 def get_devices():
     devices = []
     index = 0
-    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, 'SYSTEM\\CurrentControlSet\\Enum\\PCI')
+    key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                         'SYSTEM\\CurrentControlSet\\Enum\\PCI')
     while True:
         try:
             hwid = winreg.EnumKey(key, index).split('&')[0:2]
@@ -45,7 +46,7 @@ def get_devices():
 
 
 def get_gpu() -> tuple:
-    gpu_list = gpus().read()
+    gpu_list = nvgpus().read()
     devices = get_devices()
 
     for gpu in gpu_list.keys():
@@ -70,7 +71,7 @@ def system_type() -> str:
 def get_installed_driver_version() -> float:
     try:
         query_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
-                            r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
+                                   r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\{B2FE1952-0186-46C3-BAEC-A80AA35AC5B8}_Display.Driver")
     except FileNotFoundError:
         logging.error('NVIDIA Display Driver is not installed.')
         raise Exception('NVIDIA Display Driver is not installed.')

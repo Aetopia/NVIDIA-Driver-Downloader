@@ -13,7 +13,8 @@ from core.cli import cli
 from plugins.textformat import eol, fg
 
 logging.basicConfig(filename=f'{gettempdir()}/nvddl.log', filemode='w+',
-            format='%(levelname)s: %(message)s', level='INFO')
+                    format='%(levelname)s: %(message)s', level='INFO')
+
 
 def main():
     try:
@@ -32,6 +33,7 @@ def main():
             f.write(format_exc())
         logging.info('Exiting...')
         exit(1)
+
 
 if __name__ == '__main__':
     main()
