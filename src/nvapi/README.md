@@ -1,1 +1,0 @@
-This module provides the needed functions and tools to access the NVIDIA Download API.
